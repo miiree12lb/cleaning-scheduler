@@ -1,0 +1,69 @@
+.theme-switch {
+    display: inline-block;
+    width: 64px;
+    height: 32px;
+    position: relative;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.icon {
+    z-index: 1;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+/* Highlight the icon for the current theme */
+.theme-switch input:not(:checked) + .slider .sun-icon,
+.theme-switch input:checked + .slider .moon-icon {
+    color: var(--accent);
+}
+
+/* El cercle de selecció (Thumb) */
+.thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 0.3s ease;
+    z-index: 2;
+}
+
+.slider:hover {
+    border-color: var(--accent);
+}
+
+.theme-switch input:checked + .slider .thumb {
+    transform: translateX(32px);
+}
+
+/* Keyboard focus: show a ring, since the real input is invisible */
+.theme-switch input:focus-visible + .slider {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
