@@ -11,7 +11,8 @@ tasks.get("/", async (c) => {
     const { houseId } = c.get("membership");
     const { results } = await c.env.DB.prepare(
         `SELECT id, house_id, name, description 
-        FROM tasks WHERE house_id = ? 
+        FROM tasks 
+        WHERE house_id = ? 
         ORDER BY active DESC, name`
     ).bind(houseId).all<Task>();
     return c.json(results);
@@ -72,6 +73,28 @@ tasks.post("/", requireAdmin, async (c) => {
     ).bind(houseId, name, description).first<Task>();
 
     return c.json(task, 201);
+});
+
+tasks.delete("/:taskId", requireAdmin, async (c) => {
+    const taskId = Number(c.req.param("taskId"));
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+        return c.json({ error: "Invalid task id" }, 400);
+    }
+
+    const { houseId } = c.get("membership"); 
+    const existing = await c.env.DB.prepare("SELECT id FROM tasks WHERE id = ? AND house_id = ?").bind(taskId, houseId).first<{ id: number }>();
+    if (!existing) {
+        return c.json({ error: "Task not found" }, 404);
+    }
+
+    const history = await c.env.DB.prepare("SELECT 1 FROM assignments WHERE task_id = ? LIMIT 1").bind(taskId).first();
+    if (!history) {
+        await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(taskId).run();
+        return c.json({ result: "deleted" });
+    }
+
+    await c.env.DB.prepare("UPDATE tasks SET active = 0 WHERE id = ?").bind(taskId).run();
+    return c.json({ result: "archived" });
 });
 
 export default tasks;
