@@ -11,7 +11,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "cleaning_db",
+			"binding": "DB",
 			"database_name": "cleaning-db",
 			"database_id": "25961695-4578-4731-91d9-d6c4753f5e81",
 			"migrations_dir": "server/migrations"
