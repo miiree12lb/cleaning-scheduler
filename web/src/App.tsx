@@ -7,10 +7,12 @@ import RequireAuth from "./auth/RequireAuth";
 import Layout from "./utils/Layout";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Current from "./pages/Current";
-import Calendar from "./pages/Calendar";
-import Dishwasher from "./pages/Dishwasher";
-import Rules from "./pages/Rules";
+import Current from "./pages/house/Current";
+import Calendar from "./pages/house/Calendar";
+import Dishwasher from "./pages/house/Dishwasher";
+import Rules from "./pages/house/Rules";
+import Home from "./pages/Home";
+import CreateHouse from "./pages/CreateHouse";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -38,11 +40,17 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
 
                 <Route element={<RequireAuth />}>
-                    <Route element={<Layout theme={theme} toggleTheme={toggleTheme} />}>
-                        <Route path="/" element={<Current />} />
-                        <Route path="/calendar" element={<Calendar />} />
-                        <Route path="/dishwasher" element={<Dishwasher />} />
-                        <Route path="/rules" element={<Rules />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/houses/new" element={<CreateHouse />} />
+
+                    <Route
+                        path="/houses/:houseId"
+                        element={<Layout theme={theme} toggleTheme={toggleTheme} />}
+                    >
+                        <Route index element={<Current />} />
+                        <Route path="calendar" element={<Calendar />} />
+                        <Route path="dishwasher" element={<Dishwasher />} />
+                        <Route path="rules" element={<Rules />} />
                     </Route>
                 </Route>
 

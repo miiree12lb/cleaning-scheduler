@@ -9,10 +9,10 @@ import "../css/navbar.css";
 
 export default function Navbar({ theme, toggleTheme }: ThemeToggleProps) {
     const items: NavbarItem[] = [
-        { name: "This week", link: "/" },
-        { name: "Calendar", link: "/calendar" },
-        { name: "Dishwasher", link: "/dishwasher" },
-        { name: "House Rules", link: "/rules" },
+        { name: "This week", link: ".", end: true },
+        { name: "Calendar", link: "calendar" },
+        { name: "Dishwasher", link: "dishwasher" },
+        { name: "House Rules", link: "rules" },
     ];
 
     const { auth, logout } = useAuth();
@@ -28,7 +28,7 @@ export default function Navbar({ theme, toggleTheme }: ThemeToggleProps) {
             </div>
             <div id="nav-items">
                 {items.map((item) => (
-                    <NavLink key={item.link} to={item.link}>
+                    <NavLink key={item.link} to={item.link} end>
                         <span>{item.name}</span>
                     </NavLink>
                 ))}

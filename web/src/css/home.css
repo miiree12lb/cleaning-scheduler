@@ -1,0 +1,112 @@
+#houses-list-holder {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+}
+
+.picker-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 20px 20px;
+}
+
+.picker-card h1 {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.picker-subtitle {
+    margin: 0 0 20px;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.picker-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.picker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.picker-list .picker-row + .picker-row {
+    border-top: 1px solid var(--border);
+}
+
+.picker-row:hover {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.picker-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.picker-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.picker-name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.picker-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.picker-chevron {
+    color: var(--text-muted);
+    transition: transform 0.15s ease;
+}
+
+.picker-row:hover .picker-chevron {
+    transform: translateX(2px);
+    color: var(--accent);
+}
+
+.picker-new {
+    margin-top: 12px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    color: var(--text-muted);
+}
+
+.picker-new .picker-avatar {
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--text-muted);
+}

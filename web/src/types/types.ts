@@ -3,6 +3,7 @@ import type { SessionUser } from "../../../shared/types";
 export interface NavbarItem {
     name: string;
     link: string;
+    end?: boolean;
 }
 
 export type Theme = "light" | "dark";

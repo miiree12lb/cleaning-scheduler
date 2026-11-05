@@ -6,3 +6,8 @@ html {
     background-color: var(--bg);
     color: var(--text);
 }
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
