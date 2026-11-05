@@ -16,3 +16,8 @@ export type AuthState =
     | { status: "loading" }
     | { status: "authenticated"; user: SessionUser }
     | { status: "unauthenticated" };
+
+export type AuthContextValue = {
+    auth: AuthState;
+    logout: () => Promise<void>;
+};

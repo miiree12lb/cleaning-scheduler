@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router";
 import { useAuth } from "./AuthContext";
 
 export default function RequireAuth() {
-    const auth = useAuth();
+    const { auth } = useAuth();
 
     if (auth.status === "loading") {
         return null;

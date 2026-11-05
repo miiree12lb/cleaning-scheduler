@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { LogOut } from "lucide-react";
 
 import ThemeToggle from "./ThemeToggle";
 import { type NavbarItem, type ThemeToggleProps } from "../types/types";
@@ -14,11 +15,17 @@ export default function Navbar({ theme, toggleTheme }: ThemeToggleProps) {
         { name: "House Rules", link: "/rules" },
     ];
 
-    const auth = useAuth();
+    const { auth, logout } = useAuth();
 
     return (
         <nav>
-            <div id="user-name">{auth.status === "authenticated" ? auth.user.name : ""}</div>
+            <div id="user-info">
+                <span>{auth.status === "authenticated" ? auth.user.name : ""}</span>
+                <button className="logout-button" onClick={logout}>
+                    <LogOut size={16} aria-hidden="true" />
+                    <span>Log out</span>
+                </button>
+            </div>
             <div id="nav-items">
                 {items.map((item) => (
                     <NavLink key={item.link} to={item.link}>
