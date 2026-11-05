@@ -1,9 +1,8 @@
 import { type SessionUser } from "../../shared/types";
+import { randomHex } from "./random";
 
 function generateSessionId(): string {
-    const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    return randomHex(32);
 }
 
 export async function createSession(db: D1Database, userId: number): Promise<string> {
