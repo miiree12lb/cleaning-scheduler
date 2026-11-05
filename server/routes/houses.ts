@@ -20,6 +20,28 @@ houses.get("/", async (c) => {
     return c.json(results);
 });
 
+houses.get("/:id", async (c) => {
+    const user: SessionUser = c.get("user");
+
+    const houseId = Number(c.req.param("id"));
+    if (!Number.isInteger(houseId) || houseId <= 0) {
+        return c.json({ error: "Invalid house id" }, 400);
+    }
+
+    const row = await c.env.DB.prepare(
+        `SELECT houses.id, houses.name, house_members.role
+        FROM house_members
+        JOIN houses ON houses.id = house_members.house_id
+        WHERE house_members.user_id = ?
+          AND houses.id = ?`
+    ).bind(user.id, houseId).first<HouseSummary>();
+
+    if (!row) {
+        return c.json({ error: "House not found" }, 404);
+    }
+    return c.json(row);
+});
+
 houses.post("/", async (c) => {
     const user = c.get("user");
     
