@@ -1,0 +1,5 @@
+{
+  "name": "cleaning-scheduler",
+  "main": "server/index.ts",
+  "compatibility_date": "2026-11-05"
+}
