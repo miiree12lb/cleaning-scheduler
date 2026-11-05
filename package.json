@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/miiree12lb/cleaning-scheduler#readme",
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
     "wrangler": "^4.157.0"
   }
