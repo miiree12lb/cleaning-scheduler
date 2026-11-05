@@ -2,7 +2,6 @@ import { Sun, Moon } from "lucide-react";
 import { type ThemeToggleProps } from "../types/types";
 import "../css/ThemeToggle.css";
 
-
 const ThemeToggle = ({ theme, toggleTheme }: ThemeToggleProps) => {
     return (
         <label className="theme-switch">

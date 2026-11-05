@@ -5,7 +5,7 @@ import { type NavbarItem, type ThemeToggleProps } from "../types/types";
 
 import "../css/navbar.css";
 
-export default function Navbar({theme, toggleTheme}: ThemeToggleProps) {
+export default function Navbar({ theme, toggleTheme }: ThemeToggleProps) {
     const items: NavbarItem[] = [
         { name: "This week", link: "/" },
         { name: "Calendar", link: "/calendar" },
@@ -22,9 +22,8 @@ export default function Navbar({theme, toggleTheme}: ThemeToggleProps) {
                     </NavLink>
                 ))}
             </div>
-            
 
-            <ThemeToggle theme={theme} toggleTheme={toggleTheme}/>
+            <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         </nav>
     );
 }

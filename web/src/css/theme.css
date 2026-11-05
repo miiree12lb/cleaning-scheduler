@@ -6,9 +6,9 @@
     --text-muted: #6b6962;
     --accent: #2f7d5b;
     --accent-contrast: #ffffff; /* text on accent buttons */
-    --danger: #c2492f;          /* overdue */
-    --warning: #a86a12;         /* due today */
-    --success: #2f7d5b;         /* done */
+    --danger: #c2492f; /* overdue */
+    --warning: #a86a12; /* due today */
+    --success: #2f7d5b; /* done */
 }
 
 :root[data-theme="dark"] {
