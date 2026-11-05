@@ -3,6 +3,7 @@ import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import { requireAdmin, requireMember } from "../lib/membership";
 import type { Task } from "../../shared/types";
+import { parseId } from "../lib/validate";
 
 const tasks = new Hono<AppEnv>();
 tasks.use(requireAuth, requireMember);
@@ -76,10 +77,7 @@ tasks.post("/", requireAdmin, async (c) => {
 });
 
 tasks.delete("/:taskId", requireAdmin, async (c) => {
-    const taskId = Number(c.req.param("taskId"));
-    if (!Number.isInteger(taskId) || taskId <= 0) {
-        return c.json({ error: "Invalid task id" }, 400);
-    }
+    const taskId = parseId(c.req.param("taskId"));
 
     const { houseId } = c.get("membership"); 
     const existing = await c.env.DB.prepare("SELECT id FROM tasks WHERE id = ? AND house_id = ?").bind(taskId, houseId).first<{ id: number }>();
@@ -95,6 +93,17 @@ tasks.delete("/:taskId", requireAdmin, async (c) => {
 
     await c.env.DB.prepare("UPDATE tasks SET active = 0 WHERE id = ?").bind(taskId).run();
     return c.json({ result: "archived" });
+});
+
+tasks.post("/:taskId/restore", requireAdmin, async (c) => {
+    const taskId = parseId(c.req.param("taskId"));
+    const { houseId } = c.get("membership");
+    const task = await c.env.DB.prepare("UPDATE tasks SET active = 1 WHERE id = ? AND house_id = ? RETURNING id, name, description, active").bind(taskId, houseId).first<Task>();
+    if (!task) {
+        return c.json({ error: "Task not found" }, 404);
+    }
+
+    return c.json(task);
 });
 
 export default tasks;

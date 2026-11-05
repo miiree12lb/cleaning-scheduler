@@ -3,6 +3,7 @@ import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import type { SessionUser, HouseSummary } from "../../shared/types";
 import { randomHex } from "../lib/random";
+import { parseId } from "../lib/validate";
 
 const houses = new Hono<AppEnv>();
 houses.use(requireAuth);
@@ -23,10 +24,7 @@ houses.get("/", async (c) => {
 houses.get("/:id", async (c) => {
     const user: SessionUser = c.get("user");
 
-    const houseId = Number(c.req.param("id"));
-    if (!Number.isInteger(houseId) || houseId <= 0) {
-        return c.json({ error: "Invalid house id" }, 400);
-    }
+    const houseId = parseId(c.req.param("houseId"));
 
     const row = await c.env.DB.prepare(
         `SELECT houses.id, houses.name, house_members.role
