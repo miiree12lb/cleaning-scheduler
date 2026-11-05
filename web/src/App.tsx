@@ -3,7 +3,10 @@ import { BrowserRouter, Route, Routes } from "react-router";
 
 import { type Theme } from "./types/types";
 
-import Navbar from "./utils/Navbar";
+import RequireAuth from "./auth/RequireAuth";
+import Layout from "./utils/Layout";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 import Current from "./pages/Current";
 import Calendar from "./pages/Calendar";
 import Dishwasher from "./pages/Dishwasher";
@@ -31,16 +34,20 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <Navbar theme={theme} toggleTheme={toggleTheme} />
+            <Routes>
+                <Route path="/login" element={<Login />} />
 
-            <main>
-                <Routes>
-                    <Route path="/" element={<Current />} />
-                    <Route path="/calendar" element={<Calendar />} />
-                    <Route path="/dishwasher" element={<Dishwasher />} />
-                    <Route path="/Rules" element={<Rules />} />
-                </Routes>
-            </main>
+                <Route element={<RequireAuth />}>
+                    <Route element={<Layout theme={theme} toggleTheme={toggleTheme} />}>
+                        <Route path="/" element={<Current />} />
+                        <Route path="/calendar" element={<Calendar />} />
+                        <Route path="/dishwasher" element={<Dishwasher />} />
+                        <Route path="/rules" element={<Rules />} />
+                    </Route>
+                </Route>
+
+                <Route path="*" element={<NotFound />} />
+            </Routes>
         </BrowserRouter>
     );
 }

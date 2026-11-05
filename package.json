@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run build && wrangler dev",
-    "dev:web": "npm --prefix web run dev",
+    "dev": "npm --prefix web run dev",
     "build": "npm --prefix web run build",
     "deploy": "npm run build && wrangler deploy",
     "typecheck": "tsc -p .",

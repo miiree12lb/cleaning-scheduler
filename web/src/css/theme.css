@@ -23,3 +23,9 @@
     --warning: #e0a94a;
     --success: #5fbf92;
 }
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
