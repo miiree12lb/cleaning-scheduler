@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm --prefix web run dev",
+    "dev:login": "wrangler d1 execute cleaning-db --local --command \"INSERT OR REPLACE INTO sessions (id, user_id, expires_at) VALUES ('test-session', 1, datetime('now', '+1 day'))\"",
     "build": "npm --prefix web run build",
     "deploy": "npm run build && wrangler deploy",
     "typecheck": "tsc -p .",

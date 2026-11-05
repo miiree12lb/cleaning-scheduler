@@ -9,3 +9,11 @@ export type HouseSummary = {
     name: string;
     role: "admin" | "member";
 };
+
+export type Task = {
+    id: number;
+    house_id: number;
+    name: string;
+    description?: string;
+    active: number;
+}

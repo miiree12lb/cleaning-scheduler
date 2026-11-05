@@ -48,7 +48,8 @@ CREATE TABLE tasks (
     name TEXT NOT NULL,
     description TEXT,
     active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (house_id, name)
 );
 
 CREATE TABLE assignments (
