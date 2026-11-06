@@ -1,8 +1,9 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { Archive, ArchiveRestore } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil } from "lucide-react";
 import type { Task } from "../../../../../shared/types";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
 import AddTaskForm from "./AddTaskForm";
+import EditTaskRow from "./EditTaskRow";
 import "../../../css/settings.css";
 
 type Props = {
@@ -19,6 +20,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
     const [tasks, setTasks] = useState<Task[] | null>(null);
     const [error, setError] = useState(false);
     const [busyId, setBusyId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
     const [actionError, setActionError] = useState<string | null>(null);
     const [pendingRemoval, setPendingRemoval] = useState<Task | null>(null);
     const [pendingRestore, setPendingRestore] = useState<Task | null>(null);
@@ -131,21 +133,50 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                 <p className="empty">No tasks yet.</p>
             ) : (
                 <ul className="task-list">
-                    {active.map((task) => (
-                        <TaskRow key={task.id} task={task}>
-                            {isAdmin && (
-                                <button
-                                    className="icon-button danger"
-                                    onClick={() => setPendingRemoval(task)}
-                                    disabled={busyId === task.id}
-                                    aria-label={`Remove ${task.name}`}
-                                    title="Remove"
-                                >
-                                    <Archive size={16} aria-hidden="true" />
-                                </button>
-                            )}
-                        </TaskRow>
-                    ))}
+                    {active.map((task) =>
+                        task.id === editingId ? (
+                            <EditTaskRow
+                                key={task.id}
+                                houseId={houseId}
+                                task={task}
+                                onSaved={(saved) => {
+                                    setTasks((prev) =>
+                                        prev === null
+                                            ? prev
+                                            : prev
+                                                .map((t) => (t.id === saved.id ? saved : t))
+                                                .sort((a, b) => a.name.localeCompare(b.name)),
+                                    );
+                                    setEditingId(null);
+                                }}
+                                onCancel={() => setEditingId(null)}
+                            />
+                        ) : (
+                            <TaskRow key={task.id} task={task}>
+                                {isAdmin && (
+                                    <>
+                                        <button
+                                            className="icon-button"
+                                            onClick={() => setEditingId(task.id)}
+                                            aria-label={`Edit ${task.name}`}
+                                            title="Edit"
+                                        >
+                                            <Pencil size={16} aria-hidden="true" />
+                                        </button>
+                                        <button
+                                            className="icon-button danger"
+                                            onClick={() => setPendingRemoval(task)}
+                                            disabled={busyId === task.id}
+                                            aria-label={`Remove ${task.name}`}
+                                            title="Remove"
+                                        >
+                                            <Archive size={16} aria-hidden="true" />
+                                        </button>
+                                    </>
+                                )}
+                            </TaskRow>
+                        ),
+                    )}
                 </ul>
             )}
 

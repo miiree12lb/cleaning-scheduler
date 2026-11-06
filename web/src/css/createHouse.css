@@ -85,8 +85,11 @@
     font-variant-numeric: tabular-nums;
 }
 
-.primary-button {
+.card .primary-button {
     width: 100%;
+}
+
+.primary-button {
     font: inherit;
     font-weight: 600;
     padding: 11px 16px;

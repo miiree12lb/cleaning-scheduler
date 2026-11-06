@@ -256,3 +256,69 @@
     color: var(--danger);
     font-size: 0.85rem;
 }
+
+.edit-task .form-error {
+    margin: 10px 0 0;
+    color: var(--danger);
+    font-size: 0.85rem;
+}
+
+.primary-button,
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+        filter 0.15s ease,
+        background-color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.primary-button {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-contrast);
+}
+
+.primary-button:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.secondary-button {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+}
+
+.secondary-button:hover:not(:disabled) {
+    background: var(--bg);
+}
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.task-row.editing {
+    display: block;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.edit-task-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
