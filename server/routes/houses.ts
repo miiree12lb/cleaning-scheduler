@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../types/types";
-import { requireAuth } from "../lib/auth";
 import type { SessionUser, HouseSummary } from "../../shared/types";
 import { parseName } from "../lib/validate";
 import { randomHex } from "../lib/random";
 import { parseId } from "../lib/validate";
+import { requireAuth } from "../lib/auth";
+import { requireAdmin, requireMember } from "../lib/membership";
 
 const houses = new Hono<AppEnv>();
 houses.use(requireAuth);
@@ -70,6 +71,33 @@ houses.post("/", async (c) => {
 
     const houseId = results[0].meta.last_row_id;
     return c.json({ id: houseId, name, role: "admin" }, 201);
+});
+
+houses.delete("/:houseId", requireMember, requireAdmin, async (c) => {
+    const { houseId } = c.get("membership");
+
+    let body;
+    try {
+        body = await c.req.json();
+    } catch {
+        return c.json({ error: "Body must be JSON" }, 400);
+    }
+
+    // The typed confirmation must match the house's name
+    const house = await c.env.DB.prepare("SELECT name FROM houses WHERE id = ?")
+        .bind(houseId)
+        .first<{ name: string }>();
+    if (!house) {
+        return c.json({ error: "House not found" }, 404);
+    }
+    if (typeof body?.confirmName !== "string" || body.confirmName.trim() !== house.name) {
+        return c.json({ error: "Type the house's name exactly to confirm" }, 400);
+    }
+
+    // Members, invites, tasks, schedule history and rules are deleted with it (ON DELETE CASCADE)
+    await c.env.DB.prepare("DELETE FROM houses WHERE id = ?").bind(houseId).run();
+
+    return c.json({ ok: true });
 });
 
 export default houses;
