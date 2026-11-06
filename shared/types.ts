@@ -18,7 +18,8 @@ export type Task = {
     active: number;
 }
 
-export type Role = "admin" | "member";
+export const ROLES = ["admin", "member"] as const;
+export type Role = (typeof ROLES)[number];
 
 export type Member = {
     id: number;

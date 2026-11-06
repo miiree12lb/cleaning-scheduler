@@ -1,4 +1,5 @@
 import type { ParseResult } from "../types/types";
+import { type Role, ROLES } from "../../shared/types";
 
 export function parseId(value: string | undefined): number | null {
     const id = Number(value);
@@ -42,4 +43,8 @@ export function parseInviteCode(input: string | undefined): string | null {
     if (input === undefined) return null;
     const code = input.trim().toLowerCase();
     return /^[0-9a-f]{10}$/.test(code) ? code : null;
+}
+
+export function parseRole(input: unknown): Role | null {
+    return ROLES.includes(input as Role) ? (input as Role) : null;
 }
