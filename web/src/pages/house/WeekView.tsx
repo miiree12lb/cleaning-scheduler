@@ -1,7 +1,6 @@
 import { Check } from "lucide-react";
 import type { WeekPlan, Assignment } from "../../../../shared/types";
 
-
 type Props = {
     plan: WeekPlan;
     myId: number | null;
@@ -9,14 +8,27 @@ type Props = {
     busyTaskId?: number | null;
 };
 
+type Person = {
+    name: string;
+    isMe: boolean;
+    tasks: Assignment[];
+};
+
 export default function WeekView({ plan, myId, onToggle, busyTaskId = null }: Props) {
     const mine = plan.assignments.filter((a) => a.userId === myId);
     const mineDone = mine.filter((a) => a.doneAt !== null).length;
 
-    const byPerson = new Map<string, Assignment[]>();
+    // Group by user ID (names aren't unique). Former members share one group.
+    const byPerson = new Map<number | "former", Person>();
     for (const a of plan.assignments) {
-        const name = a.userName ?? "Former member";
-        byPerson.set(name, [...(byPerson.get(name) ?? []), a]);
+        const key = a.userId ?? "former";
+        const person = byPerson.get(key) ?? {
+            name: a.userName ?? "Former member",
+            isMe: a.userId !== null && a.userId === myId,
+            tasks: [],
+        };
+        person.tasks.push(a);
+        byPerson.set(key, person);
     }
 
     const isPreview = plan.status === "preview";
@@ -50,6 +62,7 @@ export default function WeekView({ plan, myId, onToggle, busyTaskId = null }: Pr
                                 <TaskItem
                                     assignment={a}
                                     variant="mine"
+                                    myId={myId}
                                     onToggle={onToggle}
                                     busy={busyTaskId === a.taskId}
                                 />
@@ -69,27 +82,31 @@ export default function WeekView({ plan, myId, onToggle, busyTaskId = null }: Pr
                     <p className="week-empty">No tasks this week.</p>
                 ) : (
                     <div className="people-grid">
-                        {[...byPerson.entries()].map(([name, tasks]) => {
-                            const done = tasks.filter((t) => t.doneAt !== null).length;
+                        {[...byPerson.entries()].map(([key, person]) => {
+                            const done = person.tasks.filter((t) => t.doneAt !== null).length;
                             return (
-                                <div key={name} className="person-card">
+                                <div key={key} className="person-card">
                                     <div className="person-header">
                                         <span className="picker-avatar" aria-hidden="true">
-                                            {name.charAt(0).toUpperCase()}
+                                            {person.name.charAt(0).toUpperCase()}
                                         </span>
-                                        <span className="person-name">{name}</span>
+                                        <span className="person-name">
+                                            {person.name}
+                                            {person.isMe && <span className="member-you"> (you)</span>}
+                                        </span>
                                         {!isPreview && (
                                             <span className="person-count">
-                                                {done}/{tasks.length}
+                                                {done}/{person.tasks.length}
                                             </span>
                                         )}
                                     </div>
                                     <ul className="person-tasks">
-                                        {tasks.map((a) => (
+                                        {person.tasks.map((a) => (
                                             <li key={a.taskId}>
                                                 <TaskItem
                                                     assignment={a}
                                                     variant="person"
+                                                    myId={myId}
                                                     onToggle={onToggle}
                                                     busy={busyTaskId === a.taskId}
                                                 />
@@ -109,16 +126,20 @@ export default function WeekView({ plan, myId, onToggle, busyTaskId = null }: Pr
 type TaskItemProps = {
     assignment: Assignment;
     variant: "mine" | "person";
+    myId: number | null;
     onToggle?: (assignment: Assignment) => void;
     busy: boolean;
 };
 
-// One task: a checkbox button when it can be ticked, plain text otherwise
-function TaskItem({ assignment: a, variant, onToggle, busy }: TaskItemProps) {
+// One task: a checkbox button when it can be ticked or unticked, plain text otherwise
+function TaskItem({ assignment: a, variant, myId, onToggle, busy }: TaskItemProps) {
     const done = a.doneAt !== null;
     const base = variant === "mine" ? "my-task" : "person-task";
     const className = done ? `${base} done` : base;
     const doneBySomeoneElse = a.doneById !== null && a.doneById !== a.userId;
+
+    // Anyone can tick an open task, but only the person who ticked it can untick it
+    const canToggle = onToggle !== undefined && (!done || a.doneById === myId);
 
     const content = (
         <>
@@ -132,14 +153,14 @@ function TaskItem({ assignment: a, variant, onToggle, busy }: TaskItemProps) {
         </>
     );
 
-    if (onToggle) {
+    if (canToggle) {
         return (
             <button
                 type="button"
                 role="checkbox"
                 aria-checked={done}
                 className={className}
-                onClick={() => onToggle(a)}
+                onClick={() => onToggle?.(a)}
                 disabled={busy}
             >
                 {content}

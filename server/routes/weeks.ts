@@ -3,7 +3,7 @@ import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import { requireMember } from "../lib/membership";
 import { parseWeekStart, parseId } from "../lib/validate";
-import { readStoredWeek, loadHouseWeeks, getWeekPlan } from "../lib/schedule";
+import {readStoredWeek, loadHouseWeeks, getWeekPlan } from "../lib/schedule";
 
 const weeks = new Hono<AppEnv>();
 weeks.use(requireAuth, requireMember);
@@ -72,6 +72,7 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
 });
 
 weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
+    const user = c.get("user");
     const { houseId } = c.get("membership");
 
     const weekStart = parseWeekStart(c.req.param("weekStart"));
@@ -90,21 +91,27 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
     }
 
     if (weekStart !== weeksInfo.thisMonday) {
-        return c.json({ error: "Only this week's tasks can be marked as done" }, 409);
+        return c.json({ error: "Only this week's tasks can be changed" }, 409);
     }
 
-    await c.env.DB.prepare(
+    // Only the person who ticked it can untick it
+    const result = await c.env.DB.prepare(
         `UPDATE assignments
-        SET done_at = NULL, done_by = NULL
-        WHERE house_id = ? AND week_start = ? AND task_id = ?`,
+         SET done_at = NULL, done_by = NULL
+         WHERE house_id = ? AND week_start = ? AND task_id = ? AND done_by = ?`,
     )
-        .bind(houseId, weekStart, taskId)
+        .bind(houseId, weekStart, taskId, user.id)
         .run();
 
     const assignments = await readStoredWeek(c.env.DB, houseId, weekStart);
     const assignment = assignments.find((a) => a.taskId === taskId);
     if (!assignment) {
         return c.json({ error: "This task isn't part of this week" }, 404);
+    }
+
+    // Nothing changed, but it's still done: someone else ticked it
+    if (result.meta.changes === 0 && assignment.doneAt !== null) {
+        return c.json({ error: "Only the person who marked this task as done can undo it." }, 403);
     }
 
     return c.json(assignment);
