@@ -45,3 +45,12 @@ export type WeekPlan = {
 };
 
 export type Assignment = WeekPlan["assignments"][number];
+
+export type RuleKind = "house" | "dishwasher";
+
+export type Rule = {
+    id: number;
+    kind: RuleKind;
+    text: string;
+    position: number;
+};

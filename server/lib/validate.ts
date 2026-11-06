@@ -1,5 +1,5 @@
 import type { ParseResult } from "../types/types";
-import { type Role, ROLES } from "../../shared/types";
+import { type Role, ROLES, type Rule, type RuleKind } from "../../shared/types";
 import { mondayOf } from "./weeks";
 
 export function parseId(value: string | undefined): number | null {
@@ -55,4 +55,27 @@ export function parseWeekStart(input: string): string | null {
         return null;
     }
     return input;
+}
+
+export function parseRuleKind(input: unknown): RuleKind | null {
+    if (input === "house" || input === "dishwasher") {
+        return input;
+    }
+    return null;
+}
+
+export function parseRuleText(input: unknown): ParseResult<string> {
+    if (typeof input !== "string") {
+        return { ok: false, error: "Rule must be text" };
+    }
+
+    const rule = input.trim();
+    if (rule.length === 0) {
+        return { ok: false, error: "Rule cannot be empty" };
+    }
+    if (rule.length > 300) {
+        return { ok: false, error: "Rule cannot have more than 300 characters" };
+    }
+
+    return { ok: true, value: rule };
 }

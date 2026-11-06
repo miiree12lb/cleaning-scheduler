@@ -8,6 +8,7 @@ import invite from "./routes/invite";
 import join from "./routes/join";
 import members from "./routes/members";
 import weeks from "./routes/weeks";
+import rules from "./routes/rules";
 
 const app = new Hono<AppEnv>().basePath("/api");
 
@@ -19,5 +20,6 @@ app.route("/houses/:houseId/invite", invite);
 app.route("/join", join);
 app.route("/houses/:houseId/members", members);
 app.route("/houses/:houseId/weeks", weeks);
+app.route("/houses/:houseId/rules", rules);
 
 export default app;
