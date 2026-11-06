@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 import "../css/dialog.css";
 
 type Props = {
@@ -21,6 +21,7 @@ export default function ConfirmDialog({
     onCancel,
 }: Props) {
     const ref = useRef<HTMLDialogElement>(null);
+    const titleId = useId();
 
     // Open or close the real <dialog> when the prop changes
     useEffect(() => {
@@ -43,10 +44,10 @@ export default function ConfirmDialog({
                 // A click on the dimmed backdrop lands on the <dialog> itself
                 if (e.target === e.currentTarget) onCancel();
             }}
-            aria-labelledby="dialog-title"
+            aria-labelledby={titleId}
         >
             <div className="dialog-body">
-                <h2 id="dialog-title">{title}</h2>
+                <h2 id={titleId}>{title}</h2>
                 <p>{message}</p>
                 <div className="dialog-actions">
                     <button className="dialog-button" onClick={onCancel} autoFocus>

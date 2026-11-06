@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { Archive, ArchiveRestore } from "lucide-react";
 import type { Task } from "../../../../../shared/types";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
+import AddTaskForm from "./AddTaskForm";
 import "../../../css/settings.css";
 
 type Props = {
@@ -20,6 +21,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
     const [busyId, setBusyId] = useState<number | null>(null);
     const [actionError, setActionError] = useState<string | null>(null);
     const [pendingRemoval, setPendingRemoval] = useState<Task | null>(null);
+    const [pendingRestore, setPendingRestore] = useState<Task | null>(null);
 
     useEffect(() => {
         async function fetchTasks() {
@@ -104,6 +106,21 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                 <span className="section-count">{active.length}</span>
             </header>
 
+            {isAdmin && (
+                <AddTaskForm
+                    houseId={houseId}
+                    onCreated={(task) =>
+                        setTasks((prev) =>
+                            prev === null ? prev : [...prev, task].sort((a, b) => a.name.localeCompare(b.name)),
+                        )
+                    }
+                    onArchivedExists={(taskId) => {
+                        const task = tasks.find((t) => t.id === taskId);
+                        if (task) setPendingRestore(task);
+                    }}
+                />
+            )}
+
             {actionError && (
                 <p className="section-error" role="alert">
                     {actionError}
@@ -161,6 +178,18 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                 onConfirm={() => {
                     if (pendingRemoval) removeTask(pendingRemoval);
                     setPendingRemoval(null);
+                }}
+            />
+
+            <ConfirmDialog
+                open={pendingRestore !== null}
+                title={`"${pendingRestore?.name}" is archived`}
+                message="There's an archived task with this name. Do you want to restore it instead of creating a new one?"
+                confirmLabel="Restore"
+                onCancel={() => setPendingRestore(null)}
+                onConfirm={() => {
+                    if (pendingRestore) restoreTask(pendingRestore);
+                    setPendingRestore(null);
                 }}
             />
 
