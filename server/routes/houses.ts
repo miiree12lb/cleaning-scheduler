@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import type { SessionUser, HouseSummary } from "../../shared/types";
+import { parseName } from "../lib/validate";
 import { randomHex } from "../lib/random";
 import { parseId } from "../lib/validate";
 
@@ -23,8 +24,11 @@ houses.get("/", async (c) => {
 
 houses.get("/:id", async (c) => {
     const user: SessionUser = c.get("user");
+    const houseId = parseId(c.req.param("id"));
 
-    const houseId = parseId(c.req.param("houseId"));
+    if (houseId === null) {
+        return c.json({ error: "Invalid house id" }, 400);
+    }
 
     const row = await c.env.DB.prepare(
         `SELECT houses.id, houses.name, house_members.role
@@ -50,18 +54,11 @@ houses.post("/", async (c) => {
         return c.json({ error: "Body must be JSON" }, 400);
     }
 
-    if (typeof body.name !== "string") {
-        return c.json({ error: "Name must be text" }, 400);
+    const nameResult = parseName(body?.name);
+    if (!nameResult.ok) {
+        return c.json({ error: nameResult.error }, 400);
     }
-
-    const name = body.name.trim();
-    if (name.length === 0) {
-        return c.json({ error: "Name cannot be empty" }, 400);
-    }
-
-    if (name.length > 50) {
-        return c.json({ error: "Name cannot have more than 50 characters" }, 400);
-    }
+    const name = nameResult.value;
 
     const results = await c.env.DB.batch([
         c.env.DB.prepare("INSERT INTO houses (name, invite_code) VALUES (?, ?)")

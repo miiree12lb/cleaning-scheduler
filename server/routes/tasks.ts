@@ -3,7 +3,7 @@ import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import { requireAdmin, requireMember } from "../lib/membership";
 import type { Task } from "../../shared/types";
-import { parseId } from "../lib/validate";
+import { parseDescription, parseName, parseId } from "../lib/validate";
 
 const tasks = new Hono<AppEnv>();
 tasks.use(requireAuth, requireMember);
@@ -27,33 +27,17 @@ tasks.post("/", requireAdmin, async (c) => {
         return c.json({ error: "Body must be JSON" }, 400);
     }
 
-    if (typeof body.name !== "string") {
-        return c.json({ error: "Name must be text" }, 400);
+    const nameResult = parseName(body?.name);
+    if (!nameResult.ok) {
+        return c.json({ error: nameResult.error }, 400);
     }
+    const name = nameResult.value;
 
-    const name = body.name.trim();
-    if (name.length === 0) {
-        return c.json({ error: "Name cannot be empty" }, 400);
+    const descResult = parseDescription(body?.description)
+        if (!descResult.ok) {
+        return c.json({ error: descResult.error }, 400);
     }
-
-    if (name.length > 50) {
-        return c.json({ error: "Name cannot have more than 50 characters" }, 400);
-    }
-
-    let description: string | null = null;
-
-    if (body.description !== undefined && body.description !== null) {
-        if (typeof body.description !== "string") {
-            return c.json({ error: "Description must be text" }, 400);
-        }
-
-        const trimmed = body.description.trim();
-        if (trimmed.length > 200) {
-            return c.json({ error: "Description cannot have more than 200 characters" }, 400);
-        }
-
-        description = trimmed === "" ? null : trimmed;
-    }
+    const description = descResult.value;
 
     const { houseId } = c.get("membership");
     const existing = await c.env.DB.prepare("SELECT id, active FROM tasks WHERE house_id = ? AND name = ? COLLATE NOCASE").bind(houseId, name).first<{ id: number, active: number }>();
@@ -78,6 +62,9 @@ tasks.post("/", requireAdmin, async (c) => {
 
 tasks.delete("/:taskId", requireAdmin, async (c) => {
     const taskId = parseId(c.req.param("taskId"));
+    if (!taskId) {
+        return c.json({ error: "Invalid task id" }, 400);
+    }
 
     const { houseId } = c.get("membership"); 
     const existing = await c.env.DB.prepare("SELECT id FROM tasks WHERE id = ? AND house_id = ?").bind(taskId, houseId).first<{ id: number }>();
@@ -97,11 +84,89 @@ tasks.delete("/:taskId", requireAdmin, async (c) => {
 
 tasks.post("/:taskId/restore", requireAdmin, async (c) => {
     const taskId = parseId(c.req.param("taskId"));
+    if (!taskId) {
+        return c.json({ error: "Invalid task id" }, 400);
+    }
+
     const { houseId } = c.get("membership");
     const task = await c.env.DB.prepare("UPDATE tasks SET active = 1 WHERE id = ? AND house_id = ? RETURNING id, name, description, active").bind(taskId, houseId).first<Task>();
     if (!task) {
         return c.json({ error: "Task not found" }, 404);
     }
+
+    return c.json(task);
+});
+
+tasks.patch("/:taskId", requireAdmin, async (c) => {
+    const taskId = parseId(c.req.param("taskId"));
+    if (taskId === null) {
+        return c.json({ error: "Invalid task id" }, 400);
+    }
+
+    let body;
+    try {
+        body = await c.req.json();
+    } catch {
+        return c.json({ error: "Body must be JSON" }, 400);
+    }
+
+    // Which fields were sent? Missing means "don't change it".
+    const isObject = body !== null && typeof body === "object";
+    const hasName = isObject && "name" in body;
+    const hasDescription = isObject && "description" in body;
+
+    if (!hasName && !hasDescription) {
+        return c.json({ error: "Nothing to update" }, 400);
+    }
+
+    // Load the current task, which also checks it belongs to this house
+    const { houseId } = c.get("membership");
+    const current = await c.env.DB.prepare(
+        "SELECT id, name, description, active FROM tasks WHERE id = ? AND house_id = ?",
+    )
+        .bind(taskId, houseId)
+        .first<Task>();
+
+    if (!current) {
+        return c.json({ error: "Task not found" }, 404);
+    }
+
+    // Start from the current values, and replace only what was sent
+    let name = current.name;
+    if (hasName) {
+        const result = parseName(body.name);
+        if (!result.ok) {
+            return c.json({ error: result.error }, 400);
+        }
+        name = result.value;
+
+        const duplicate = await c.env.DB.prepare(
+            "SELECT id FROM tasks WHERE house_id = ? AND name = ? COLLATE NOCASE AND id != ?",
+        )
+            .bind(houseId, name, taskId)
+            .first<{ id: number }>();
+
+        if (duplicate) {
+            return c.json({ error: "Another task has this name" }, 409);
+        }
+    }
+
+    let description = current.description;
+    if (hasDescription) {
+        const result = parseDescription(body.description);
+        if (!result.ok) {
+            return c.json({ error: result.error }, 400);
+        }
+        description = result.value;
+    }
+
+    const task = await c.env.DB.prepare(
+        `UPDATE tasks SET name = ?, description = ?
+         WHERE id = ? AND house_id = ?
+         RETURNING id, name, description, active`,
+    )
+        .bind(name, description, taskId, houseId)
+        .first<Task>();
 
     return c.json(task);
 });
