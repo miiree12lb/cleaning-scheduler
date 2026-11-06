@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings as SettingsIcon } from "lucide-react";
 
 import ThemeToggle from "./ThemeToggle";
 import { type NavbarItem, type ThemeToggleProps } from "../types/types";
@@ -25,6 +25,10 @@ export default function Navbar({ theme, toggleTheme }: ThemeToggleProps) {
                     <LogOut size={16} aria-hidden="true" />
                     <span>Log out</span>
                 </button>
+
+                <NavLink to="settings" className="icon-link" aria-label="House settings" title="House settings">
+                    <SettingsIcon size={18} aria-hidden="true" />
+                </NavLink>
             </div>
             <div id="nav-items">
                 {items.map((item) => (
