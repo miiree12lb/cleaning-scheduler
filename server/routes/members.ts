@@ -20,7 +20,7 @@ members.get("/", async (c) => {
         ORDER BY house_members.rotation_order
     `).bind(houseId).all<Member>();
 
-    return c.json({ results });
+    return c.json(results);
 });
 
 members.patch("/me", async (c) => {

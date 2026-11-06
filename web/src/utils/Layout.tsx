@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import { type ThemeToggleProps } from "../types/types";
 import type { HouseSummary } from "../../../shared/types";
 import type { HouseContext } from "../types/types";
+import { useRefreshOnFocus } from "./useRefreshOnFocus";
 
 type Status = "loading" | "ready" | "not-found" | "error";
 
@@ -40,11 +41,8 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
         loadHouse(true);
     }, [loadHouse]);
 
-    useEffect(() => {
-        const onFocus = () => loadHouse(false);
-        window.addEventListener("focus", onFocus);
-        return () => window.removeEventListener("focus", onFocus);
-    }, [loadHouse]);
+    const reloadQuietly = useCallback(() => loadHouse(false), [loadHouse]);
+    useRefreshOnFocus(reloadQuietly);
 
     if (status === "loading") return null;
     if (status === "not-found") return <Navigate to="/" replace />;
@@ -52,7 +50,7 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
 
     const context: HouseContext = {
         house,
-        reloadHouse: () => loadHouse(false),
+        reloadHouse: reloadQuietly,
     };
 
     return (

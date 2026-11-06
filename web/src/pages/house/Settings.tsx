@@ -1,15 +1,17 @@
 import { useHouse } from "../../utils/useHouse";
-import TasksSection from "./settings/TasksSection";
+import TasksSection from "./settings/tasks/TasksSection";
 import InviteSection from "./settings/InviteSection";
+import MembersSection from "./settings/members/MembersSection";
 
 export default function Settings() {
-    const { house, reloadHouse } = useHouse();
+    const { house } = useHouse();
 
     return (
         <div className="settings">
             <h1>Settings</h1>
             {house.role === "admin" && <InviteSection houseId={house.id} />}
             <TasksSection houseId={house.id} isAdmin={house.role === "admin"} />
+            <MembersSection houseId={house.id} isAdmin={house.role === "admin"} />
         </div>
     );
 }

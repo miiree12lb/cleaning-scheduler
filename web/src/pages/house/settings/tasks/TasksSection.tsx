@@ -1,10 +1,10 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { Archive, ArchiveRestore, Pencil } from "lucide-react";
-import type { Task } from "../../../../../shared/types";
-import ConfirmDialog from "../../../utils/ConfirmDialog";
+import type { Task } from "../../../../../../shared/types";
+import ConfirmDialog from "../../../../utils/ConfirmDialog";
 import AddTaskForm from "./AddTaskForm";
 import EditTaskRow from "./EditTaskRow";
-import "../../../css/settings.css";
+import "../../../../css/settings.css";
 
 type Props = {
     houseId: number;

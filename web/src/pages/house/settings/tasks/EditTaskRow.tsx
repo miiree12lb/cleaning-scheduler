@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
-import type { Task } from "../../../../../shared/types";
+import type { Task } from "../../../../../../shared/types";
 
 type Props = {
     houseId: number;
