@@ -484,3 +484,52 @@
     outline: 2px solid var(--danger);
     outline-offset: 2px;
 }
+
+.account-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.account-page h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.account-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin: 0;
+}
+
+.account-details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    margin: 0 0 12px;
+}
+
+.account-details dt {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.account-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.section-error ul {
+    margin: 6px 0 0;
+    padding-left: 20px;
+}
+
+.section-error a {
+    color: inherit;
+    font-weight: 600;
+}

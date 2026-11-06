@@ -11,6 +11,7 @@ import {
 import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "../auth/AuthContext";
 import type { Theme } from "../types/types";
+import { CircleUser } from "lucide-react";
 import "../css/navbar.css";
 
 type NavItem = {
@@ -54,7 +55,10 @@ export default function Navbar({ theme, toggleTheme, houseName }: Props) {
                 </nav>
 
                 <div className="topbar-actions">
-                    <span className="topbar-user">{userName}</span>
+                    <Link to="/account" className="topbar-user" title="Your account">
+                        <CircleUser size={18} aria-hidden="true" />
+                        <span className="topbar-user-name">{userName}</span>
+                    </Link>
                     <NavLink to="settings" className="icon-link" aria-label="House settings" title="House settings">
                         <SettingsIcon size={18} aria-hidden="true" />
                     </NavLink>

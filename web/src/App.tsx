@@ -14,7 +14,8 @@ import Rules from "./pages/house/Rules";
 import Home from "./pages/Home";
 import CreateHouse from "./pages/CreateHouse";
 import Settings from "./pages/house/Settings";
-import JoinHouse from"./pages/JoinHouse"
+import JoinHouse from"./pages/JoinHouse";
+import Account from "./pages/Account";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -45,6 +46,7 @@ export default function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/houses/new" element={<CreateHouse />} />
                     <Route path="/join/:code" element={<JoinHouse />} />
+                    <Route path="/account" element={<Account />} />
 
                     <Route
                         path="/houses/:houseId"

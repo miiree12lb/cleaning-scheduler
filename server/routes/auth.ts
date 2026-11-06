@@ -6,11 +6,50 @@ import { deleteSession } from "../lib/session";
 import { randomHex } from "../lib/random";
 import { SESSION_DAYS, createSession } from "../lib/session";
 import { exchangeCode } from "../lib/google";
+import { removeMember } from "../lib/members";
 
 const auth = new Hono<AppEnv>();
 
 auth.get("/me", requireAuth, (c) => {
     return c.json(c.get("user"));
+});
+
+auth.delete("/me", requireAuth, async (c) => {
+    const user = c.get("user");
+
+    const { results: blocking } = await c.env.DB.prepare(
+        `SELECT houses.id, houses.name
+         FROM house_members AS me
+         JOIN houses ON houses.id = me.house_id
+         WHERE me.user_id = ? AND me.role = 'admin'
+           AND (SELECT COUNT(*) FROM house_members AS a
+                WHERE a.house_id = me.house_id AND a.role = 'admin') = 1
+         ORDER BY houses.name`,
+    )
+        .bind(user.id)
+        .all<{ id: number; name: string }>();
+
+    if (blocking.length > 0) {
+        return c.json({ error: "last_admin", houses: blocking }, 409);
+    }
+
+    const { results: memberships } = await c.env.DB.prepare(
+        "SELECT house_id AS houseId FROM house_members WHERE user_id = ?",
+    )
+        .bind(user.id)
+        .all<{ houseId: number }>();
+
+    for (const { houseId } of memberships) {
+        const result = await removeMember(c.env.DB, houseId, user.id);
+        if (result === "last_admin") {
+            return c.json({ error: "last_admin", houses: [] }, 409);
+        }
+    }
+
+    await c.env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id).run();
+
+    deleteCookie(c, "session", { path: "/" });
+    return c.json({ ok: true });
 });
 
 auth.get("/login", (c) => {

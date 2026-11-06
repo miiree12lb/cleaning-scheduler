@@ -1,11 +1,11 @@
 /* ---------- Top bar ---------- */
 
 .topbar {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     position: sticky;
     top: 0;
     z-index: 10;
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 16px;
     padding: 10px 20px;
@@ -15,15 +15,8 @@
 }
 
 .topbar-house {
-    min-width: 0;
     justify-self: start;
-}
-
-.topbar-actions {
-    justify-self: end;
-}
-
-.topbar-house {
+    min-width: 0;
     max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -38,7 +31,6 @@
 }
 
 .topbar-links {
-    flex: 1;
     display: flex;
     justify-content: center;
     gap: 4px;
@@ -67,19 +59,34 @@
 }
 
 .topbar-actions {
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-left: auto;
 }
 
 .topbar-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 8px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.topbar-user:hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.topbar-user-name {
     max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text-muted);
-    font-size: 0.9rem;
 }
 
 .icon-link {
@@ -118,6 +125,7 @@
     color: var(--text-muted);
     font: inherit;
     font-size: 0.85rem;
+    white-space: nowrap;
     cursor: pointer;
     transition:
         background-color 0.15s ease,
@@ -133,6 +141,7 @@
 
 .icon-link:focus-visible,
 .logout-button:focus-visible,
+.topbar-user:focus-visible,
 .topbar-links a:focus-visible,
 .topbar-house:focus-visible,
 .tab:focus-visible {
@@ -140,17 +149,32 @@
     outline-offset: 2px;
 }
 
-/* ---------- Bottom tab bar (phones only) ---------- */
+/* ---------- Bottom tab bar: hidden unless on a phone ---------- */
 
 .tabbar {
     display: none;
 }
 
-@media (max-width: 720px) {
+/* ---------- Medium screens: drop the name and logout text ---------- */
+
+@media (max-width: 1100px) {
+    .topbar-user-name,
+    .logout-label {
+        display: none;
+    }
+}
+
+/* ---------- Phones: must stay at the END of the file ---------- */
+
+@media (max-width: 860px) {
     .topbar {
         display: flex;
         gap: 8px;
         padding: 8px 12px 8px 16px;
+    }
+
+    .topbar-links {
+        display: none;
     }
 
     .topbar-house {
@@ -162,17 +186,13 @@
         margin-left: auto;
     }
 
-    .topbar-links,
     .topbar-user,
-    .logout-label {
-        display: none;
-    }
-
     .icon-link,
     .logout-button {
         width: 40px;
         height: 40px;
         padding: 0;
+        justify-content: center;
     }
 
     .tabbar {
