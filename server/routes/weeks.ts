@@ -6,7 +6,7 @@ import { parseWeekStart } from "../lib/validate";
 import { mondayOf, dateIn, weeksBetween, dateOfTimestamp } from "../lib/weeks";
 import type { WeekPlan } from "../../shared/types";
 import { planWeek } from "../lib/rotation"; 
-import { loadRotationInput } from "../lib/schedule";
+import { loadRotationInput, ensureCurrentWeek, readStoredWeek } from "../lib/schedule";
 
 const weeks = new Hono<AppEnv>();
 weeks.use(requireAuth, requireMember);
@@ -53,7 +53,13 @@ weeks.get("/:weekStart", async (c) => {
         return c.json({ weekStart, status, assignments });
     }
 
-    return c.json({ weekStart, status, week, assignments: [] });
+    if (status === "current") {
+        await ensureCurrentWeek(c.env.DB, houseId, weekStart, week);
+    }
+
+    // past and current both read what's stored
+    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart);
+    return c.json({ weekStart, status, assignments });
 
 });
 
