@@ -139,3 +139,51 @@ export async function getWeekPlan(
     const assignments = await readStoredWeek(db, houseId, weekStart);
     return { weekStart, status, assignments };
 }
+
+export async function assignTaskThisWeek(db: D1Database, houseId: number, taskId: number): Promise<void> {
+    const info = await loadHouseWeeks(db, houseId);
+    if (!info) return;
+
+    const thisMonday = info.thisMonday;
+
+    const row = await db
+    .prepare(
+        `SELECT 1 FROM assignments
+         WHERE house_id = ? AND week_start = ?
+         LIMIT 1`,
+    )
+    .bind(houseId, thisMonday)
+    .first();
+
+    if (!row) {
+        return; // no week yet: it'll include the task when it's created
+    }
+    
+    const target = await db
+        .prepare(
+            `SELECT house_members.user_id AS userId
+            FROM house_members
+            LEFT JOIN assignments
+                ON assignments.user_id = house_members.user_id
+                AND assignments.house_id = house_members.house_id
+                AND assignments.week_start = ?
+            WHERE house_members.house_id = ?
+            GROUP BY house_members.user_id
+            ORDER BY COUNT(assignments.id), house_members.rotation_order
+            LIMIT 1`,
+        )
+        .bind(thisMonday, houseId)
+        .first<{ userId: number }>();
+
+    if (!target) return; // no members at all: nobody to assign it to
+
+    // 4. Assign the task to them for this week
+    await db
+        .prepare(
+            `INSERT INTO assignments (house_id, week_start, task_id, user_id)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT (house_id, week_start, task_id) DO NOTHING`,
+        )
+        .bind(houseId, thisMonday, taskId, target.userId)
+        .run();
+}

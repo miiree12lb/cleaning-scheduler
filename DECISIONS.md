@@ -39,12 +39,11 @@ Changes apply immediately, but only touch what they have to. Nobody's existing t
 
 | Change | What happens this week |
 |---|---|
-| Task added | Assigned now, to the member with the fewest tasks this week |
 | Task archived | This week's assignment is removed, unless it's already done |
-| Member leaves | Their unfinished tasks go to whoever has the fewest |
-| Member joins | Joins the rotation from next Monday |
-| Every Monday | Full rotation with the formula |
 | Member joins | Joins the rotation from next Monday (and shows up in next week's preview right away) |
+| Member leaves | Their unfinished tasks go to whoever has the fewest |
+|| Task added | Assigned now, to the member with the fewest tasks this week (including someone who joined this week) |
+| Every Monday | Full rotation with the formula |
 
 Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 
