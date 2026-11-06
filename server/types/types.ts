@@ -18,3 +18,5 @@ export type AppEnv = {
 export type ParseResult<T> =
     | { ok: true; value: T }
     | { ok: false; error: string };
+
+export type RemoveResult = "removed" | "not_found" | "last_admin";

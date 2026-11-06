@@ -4,6 +4,7 @@ import { requireMember, requireAdmin } from "../lib/membership";
 import { requireAuth } from "../lib/auth";
 import type { Member } from "../../shared/types";
 import { parseId, parseRole } from "../lib/validate";
+import { removeMember } from "../lib/members";
 
 const members = new Hono<AppEnv>();
 members.use(requireAuth, requireMember);
@@ -49,6 +50,43 @@ members.patch("/me", async (c) => {
         return c.json({ error: "Uses dishwasher not found" }, 404);
     }
     return c.json({ uses_dishwasher: row.uses_dishwasher });
+});
+
+members.delete("/me", async (c) => {
+    const { houseId } = c.get("membership");
+    const user = c.get("user");
+
+    const result = await removeMember(c.env.DB, houseId, user.id);
+
+    if (result === "last_admin") {
+        return c.json(
+            { error: "You're the only admin. Make someone else admin first, or delete the house." },
+            409,
+        );
+    }
+    return c.json({ ok: true });
+});
+
+members.delete("/:userId", requireAdmin, async (c) => {
+    const { houseId } = c.get("membership");
+    
+    const userId = parseId(c.req.param("userId"));
+    if (!userId) {
+        return c.json({ error: "Invalid user id" }, 400)
+    }
+
+    const result = await removeMember(c.env.DB, houseId, userId);
+
+    if (result === "last_admin") {
+        return c.json(
+            { error: "There must be at least one admin in the house. Make someone else admin first, or delete the house." },
+            409,
+        );
+    }
+    else if (result === "not_found") {
+        return c.json("Member not found", 404);
+    }
+    return c.json({ ok: true });
 });
 
 members.patch("/:userId/role", requireAdmin, async (c) => {

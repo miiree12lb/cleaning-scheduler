@@ -87,6 +87,7 @@
 
 .card .primary-button {
     width: 100%;
+    justify-content: center;
 }
 
 .primary-button {

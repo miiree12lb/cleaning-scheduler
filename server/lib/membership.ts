@@ -1,5 +1,6 @@
 import { createMiddleware } from "hono/factory";
-import type { AppEnv, Role } from "../types/types";
+import type { AppEnv } from "../types/types";
+import type { Role } from "../../shared/types";
 import type { SessionUser } from "../../shared/types";
 import { parseId } from "./validate";
 
