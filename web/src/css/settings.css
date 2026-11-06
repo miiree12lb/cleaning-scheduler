@@ -379,3 +379,35 @@
     color: var(--text-muted);
     font-weight: 400;
 }
+
+.member-row {
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+
+.member-row .task-text {
+    flex: 1 1 140px;
+}
+
+.member-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px 12px;
+    margin-left: auto;
+}
+
+@media (max-width: 640px) {
+    .member-meta {
+        flex-basis: 100%;
+        justify-content: flex-start;
+        padding-left: 44px; /* line up under the name: avatar (32px) + gap (12px) */
+    }
+}

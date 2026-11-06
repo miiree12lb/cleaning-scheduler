@@ -171,3 +171,27 @@
     font-size: 0.8rem;
     border-radius: 50%;
 }
+
+@media (max-width: 640px) {
+    .rule-row {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .rule-text {
+        flex: 1 1 0;
+    }
+
+    .rule-actions {
+        flex-basis: 100%;
+        justify-content: flex-end;
+        padding-left: 42px; /* line up under the text: number (28px) + gap (14px) */
+        gap: 4px;
+    }
+
+    .rule-actions .icon-button {
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+    }
+}

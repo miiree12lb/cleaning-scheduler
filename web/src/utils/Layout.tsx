@@ -55,7 +55,7 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
 
     return (
         <>
-            <Navbar theme={theme} toggleTheme={toggleTheme} />
+            <Navbar theme={theme} toggleTheme={toggleTheme} houseName={house.name} />
             <main>
                 <Outlet context={context} />
             </main>

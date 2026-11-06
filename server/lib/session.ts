@@ -1,6 +1,8 @@
 import { type SessionUser } from "../../shared/types";
 import { randomHex } from "./random";
 
+export const SESSION_DAYS = 30;
+
 function generateSessionId(): string {
     return randomHex(32);
 }
@@ -9,10 +11,8 @@ export async function createSession(db: D1Database, userId: number): Promise<str
     const array = new Uint32Array(10);
     const sessionId = generateSessionId();
     await db
-        .prepare(
-            "INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
-        )
-        .bind(sessionId, userId)
+        .prepare("INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', ?))")
+        .bind(sessionId, userId, `+${SESSION_DAYS} days`)
         .run();
     return sessionId;
 } 

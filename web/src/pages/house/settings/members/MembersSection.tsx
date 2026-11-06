@@ -183,61 +183,65 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                                 </span>
                             </div>
 
-                            {isMe ? (
-                                <Switch
-                                    checked={member.uses_dishwasher === 1}
-                                    onChange={setUsesDishwasher}
-                                    label="I use the dishwasher"
-                                    disabled={savingDishwasher}
-                                />
-                            ) : (
-                                member.uses_dishwasher === 1 && (
-                                    <span className="picker-badge">Uses dishwasher</span>
-                                )
-                            )}
+                            <div className="member-meta">
+                                {isMe ? (
+                                    <Switch
+                                        checked={member.uses_dishwasher === 1}
+                                        onChange={setUsesDishwasher}
+                                        label="I use the dishwasher"
+                                        disabled={savingDishwasher}
+                                    />
+                                ) : (
+                                    member.uses_dishwasher === 1 && (
+                                        <span className="picker-badge">Uses dishwasher</span>
+                                    )
+                                )}
+                            
 
-                            {member.role === "admin" && <span className="picker-badge">Admin</span>}
+                                {member.role === "admin" && <span className="picker-badge">Admin</span>}
+                            
 
-                            <div className="task-actions">
-                                {isAdmin && !isMe && (
-                                    <>
+                                <div className="task-actions">
+                                    {isAdmin && !isMe && (
+                                        <>
+                                            <button
+                                                className="icon-button"
+                                                onClick={() =>
+                                                    changeRole(member, member.role === "admin" ? "member" : "admin")
+                                                }
+                                                disabled={busy}
+                                            >
+                                                {member.role === "admin" ? "Make member" : "Make admin"}
+                                            </button>
+                                            <button
+                                                className="icon-button danger"
+                                                onClick={() => setPendingRemoval(member)}
+                                                disabled={busy}
+                                                aria-label={`Remove ${member.name}`}
+                                                title="Remove"
+                                            >
+                                                <UserMinus size={16} aria-hidden="true" />
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {isMe && isAdmin && (
                                         <button
                                             className="icon-button"
-                                            onClick={() =>
-                                                changeRole(member, member.role === "admin" ? "member" : "admin")
-                                            }
+                                            onClick={() => setConfirmingStepDown(true)}
                                             disabled={busy}
                                         >
-                                            {member.role === "admin" ? "Make member" : "Make admin"}
+                                            Step down
                                         </button>
-                                        <button
-                                            className="icon-button danger"
-                                            onClick={() => setPendingRemoval(member)}
-                                            disabled={busy}
-                                            aria-label={`Remove ${member.name}`}
-                                            title="Remove"
-                                        >
-                                            <UserMinus size={16} aria-hidden="true" />
+                                    )}
+
+                                    {isMe && (
+                                        <button className="icon-button danger" onClick={() => setConfirmingLeave(true)}>
+                                            <LogOut size={16} aria-hidden="true" />
+                                            <span>Leave</span>
                                         </button>
-                                    </>
-                                )}
-
-                                {isMe && isAdmin && (
-                                    <button
-                                        className="icon-button"
-                                        onClick={() => setConfirmingStepDown(true)}
-                                        disabled={busy}
-                                    >
-                                        Step down
-                                    </button>
-                                )}
-
-                                {isMe && (
-                                    <button className="icon-button danger" onClick={() => setConfirmingLeave(true)}>
-                                        <LogOut size={16} aria-hidden="true" />
-                                        <span>Leave</span>
-                                    </button>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </li>
                     );

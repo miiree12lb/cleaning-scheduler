@@ -1,40 +1,116 @@
-nav {
-    display: flex;
-    justify-content: space-between;
+/* ---------- Top bar ---------- */
+
+.topbar {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
     align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
 }
 
-#nav-items {
-    display: flex;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+.topbar-house {
+    min-width: 0;
+    justify-self: start;
 }
 
-#nav-items a {
-    text-decoration: none;
-    color: var(--text-muted);
+.topbar-actions {
+    justify-self: end;
 }
 
-#nav-items a:hover {
+.topbar-house {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
     color: var(--text);
+    text-decoration: none;
 }
 
-#nav-items a.active {
+.topbar-house:hover {
     color: var(--accent);
 }
 
-#user-info {
-    display:flex;
+.topbar-links {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.topbar-links a {
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.topbar-links a:hover {
+    color: var(--text);
+    background: var(--surface);
+}
+
+.topbar-links a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.topbar-actions {
+    display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.topbar-user {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.icon-link:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--text);
+}
+
+.icon-link.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .logout-button {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    min-height: 36px;
     padding: 6px 10px;
     border: 1px solid transparent;
     border-radius: 8px;
@@ -55,28 +131,82 @@ nav {
     color: var(--danger);
 }
 
-.logout-button:focus-visible {
+.icon-link:focus-visible,
+.logout-button:focus-visible,
+.topbar-links a:focus-visible,
+.topbar-house:focus-visible,
+.tab:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
-.icon-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    color: var(--text-muted);
-    transition: background-color 0.15s ease, color 0.15s ease;
+/* ---------- Bottom tab bar (phones only) ---------- */
+
+.tabbar {
+    display: none;
 }
 
-.icon-link:hover {
-    background: color-mix(in srgb, var(--accent) 10%, transparent);
-    color: var(--text);
-}
+@media (max-width: 720px) {
+    .topbar {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px 8px 16px;
+    }
 
-.icon-link.active {
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    .topbar-house {
+        flex: 1;
+        max-width: none;
+    }
+
+    .topbar-actions {
+        margin-left: auto;
+    }
+
+    .topbar-links,
+    .topbar-user,
+    .logout-label {
+        display: none;
+    }
+
+    .icon-link,
+    .logout-button {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+    }
+
+    .tabbar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        padding-bottom: env(safe-area-inset-bottom);
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+    }
+
+    .tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        min-height: 58px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .tab.active {
+        color: var(--accent);
+    }
+
+    /* Leave room so the tab bar doesn't cover the end of the page */
+    main {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    }
 }

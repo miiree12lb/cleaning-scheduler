@@ -1,11 +1,5 @@
 import type { SessionUser, HouseSummary } from "../../../shared/types";
 
-export interface NavbarItem {
-    name: string;
-    link: string;
-    end?: boolean;
-}
-
 export type Theme = "light" | "dark";
 
 export interface ThemeToggleProps {
