@@ -1,0 +1,233 @@
+.week-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.week-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+}
+
+.week-dates {
+    margin: 2px 0 0;
+    color: var(--text-muted);
+}
+
+/* ---------- Your tasks ---------- */
+
+.week-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.week-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.week-card-header h2,
+.week-section-title {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.week-section-title {
+    margin-bottom: 12px;
+}
+
+.week-progress {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.week-empty,
+.week-all-done {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.week-all-done {
+    margin-top: 14px;
+    color: var(--success);
+    font-weight: 500;
+}
+
+.my-tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.my-task {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 500;
+    text-align: left;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.my-task:hover:not(:disabled) {
+    border-color: var(--accent);
+}
+
+.my-task.done {
+    background: color-mix(in srgb, var(--success) 8%, var(--bg));
+    border-color: color-mix(in srgb, var(--success) 35%, var(--border));
+}
+
+.my-task.done .my-task-name {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+}
+
+/* ---------- The check box ---------- */
+
+.check-box {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    color: transparent;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.check-box.small {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+}
+
+.done > .check-box {
+    background: var(--success);
+    border-color: var(--success);
+    color: var(--accent-contrast);
+    transform: scale(1.05);
+}
+
+.my-task:hover:not(:disabled):not(.done) .check-box,
+.person-task:hover:not(:disabled):not(.done) .check-box {
+    border-color: var(--accent);
+}
+
+.my-task:focus-visible,
+.person-task:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.my-task:disabled,
+.person-task:disabled {
+    cursor: progress;
+    opacity: 0.7;
+}
+
+/* ---------- Everyone ---------- */
+
+.people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.person-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.person-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.person-header .picker-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+}
+
+.person-name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.person-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.person-tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.person-task {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px;
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.person-task:hover:not(:disabled) {
+    background: var(--bg);
+}
+
+.person-task.done {
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
