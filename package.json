@@ -11,7 +11,8 @@
     "typecheck": "tsc -p .",
     "db:migrate:local": "wrangler d1 migrations apply cleaning-db --local",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "@types/node": "^26.6.6",
     "prettier": "^3.9.10",
     "typescript": "^7.0.2",
+    "vitest": "^5.1.0",
     "wrangler": "^4.157.0"
   },
   "dependencies": {
