@@ -9,11 +9,23 @@ const tasks = new Hono<AppEnv>();
 tasks.use(requireAuth, requireMember);
 
 tasks.get("/", async (c) => {
-    const { houseId } = c.get("membership");
+    const { houseId, role } = c.get("membership");
+    
+    if (role === "admin") {
+        const { results } = await c.env.DB.prepare(
+            `SELECT id, house_id, name, description, active 
+            FROM tasks 
+            WHERE house_id = ? 
+            ORDER BY active DESC, name`
+        ).bind(houseId).all<Task>();
+        return c.json(results);
+    }
+    
     const { results } = await c.env.DB.prepare(
-        `SELECT id, house_id, name, description 
+        `SELECT id, house_id, name, description, active 
         FROM tasks 
         WHERE house_id = ? 
+        AND active = 1
         ORDER BY active DESC, name`
     ).bind(houseId).all<Task>();
     return c.json(results);

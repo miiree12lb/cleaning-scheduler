@@ -1,0 +1,83 @@
+.dialog {
+    width: min(400px, calc(100vw - 32px));
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 20px 50px rgb(0 0 0 / 0.35);
+}
+
+.dialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.dialog[open] {
+    animation: dialog-in 0.15s ease-out;
+}
+
+@keyframes dialog-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+}
+
+.dialog-body {
+    padding: 22px 22px 18px;
+}
+
+.dialog-body h2 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+}
+
+.dialog-body p {
+    margin: 0 0 20px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.dialog-button {
+    font: inherit;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.dialog-button:hover {
+    background: var(--bg);
+}
+
+.dialog-button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+}
+
+.dialog-button.danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.dialog-button.primary:hover,
+.dialog-button.danger:hover {
+    filter: brightness(1.08);
+}
+
+.dialog-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}

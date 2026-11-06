@@ -14,6 +14,6 @@ export type Task = {
     id: number;
     house_id: number;
     name: string;
-    description?: string;
+    description: string | null;
     active: number;
 }
