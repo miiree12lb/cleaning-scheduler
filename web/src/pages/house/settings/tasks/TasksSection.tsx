@@ -4,17 +4,13 @@ import type { Task } from "../../../../../../shared/types";
 import ConfirmDialog from "../../../../utils/ConfirmDialog";
 import AddTaskForm from "./AddTaskForm";
 import EditTaskRow from "./EditTaskRow";
+import { readError } from "../../../../utils/readError";
 import "../../../../css/settings.css";
 
 type Props = {
     houseId: number;
     isAdmin: boolean;
 };
-
-async function readError(res: Response, fallback: string): Promise<string> {
-    const body: { error?: string } = await res.json().catch(() => ({}));
-    return body.error ?? fallback;
-}
 
 export default function TasksSection({ houseId, isAdmin }: Props) {
     const [tasks, setTasks] = useState<Task[] | null>(null);
