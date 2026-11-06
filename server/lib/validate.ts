@@ -37,3 +37,9 @@ export function parseDescription(input: unknown): ParseResult<string | null> {
 
     return { ok: true, value: trimmed === "" ? null : trimmed };
 }
+
+export function parseInviteCode(input: string | undefined): string | null {
+    if (input === undefined) return null;
+    const code = input.trim().toLowerCase();
+    return /^[0-9a-f]{10}$/.test(code) ? code : null;
+}
