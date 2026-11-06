@@ -20,6 +20,7 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 - Only admins can remove people.
 - People join a house **by invite link/code** or **by an admin inviting their email**. Email invites are shown to the person when they next log in (the app doesn't send emails). Invite links come first; email invites right after.
 - **Every API request for a house checks that the user is a member of that house.** This is the most important security check.
+- **The last member can't leave a house.** They have to delete the house instead, so a house's history is never deleted as a side effect.
 
 ## Tasks and the weekly rotation
 

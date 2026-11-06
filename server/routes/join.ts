@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import type { AppEnv, Role } from "../types/types";
+import type { AppEnv } from "../types/types";
+import type { Role } from "../../shared/types";
 import { requireAuth } from "../lib/auth";
 import { parseInviteCode } from "../lib/validate";
 import type { HouseSummary } from "../../shared/types";

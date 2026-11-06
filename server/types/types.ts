@@ -1,6 +1,6 @@
 import type { SessionUser } from "../../shared/types";
+import type { Role } from "../../shared/types";
 
-export type Role = "admin" | "member";
 
 export type Membership = {
     houseId: number;
