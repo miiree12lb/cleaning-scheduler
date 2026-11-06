@@ -1,6 +1,6 @@
 import type { WeekPlan } from "../../shared/types";
 import { planWeek } from "./rotation";
-import { mondayOf, dateIn, dateOfTimestamp } from "./weeks";
+import { mondayOf, dateIn, dateOfTimestamp, weeksBetween } from "./weeks";
 
 export type RotationInput = {
     members: { id: number; name: string }[];   // in rotation order
@@ -96,4 +96,46 @@ export async function loadHouseWeeks(db: D1Database, houseId: number) {
     const thisMonday = mondayOf(dateIn(houseDates.timezone));
 
     return { thisMonday, firstMonday };
+}
+
+export async function getWeekPlan(
+    db: D1Database,
+    houseId: number,
+    weekStart: string,
+): Promise<WeekPlan | null> {
+    const info = await loadHouseWeeks(db, houseId);
+    if (!info) return null;
+
+    const week = weeksBetween(info.firstMonday, weekStart);
+    const status: WeekPlan["status"] =
+        weekStart < info.thisMonday ? "past" : weekStart === info.thisMonday ? "current" : "preview";
+
+    if (status === "preview") {
+        const { members, tasks } = await loadRotationInput(db, houseId);
+        const planned = planWeek(
+            members.map((m) => m.id),
+            tasks.map((t) => t.id),
+            week,
+        );
+
+        const memberNames = new Map(members.map((m) => [m.id, m.name]));
+        const taskNames = new Map(tasks.map((t) => [t.id, t.name]));
+
+        const assignments = planned.map((a) => ({
+            taskId: a.taskId,
+            taskName: taskNames.get(a.taskId) ?? "Unknown task",
+            userId: a.userId,
+            userName: memberNames.get(a.userId) ?? "Unknown member",
+            doneAt: null,
+        }));
+
+        return { weekStart, status, assignments };
+    }
+
+    if (status === "current") {
+        await ensureCurrentWeek(db, houseId, weekStart, week);
+    }
+
+    const assignments = await readStoredWeek(db, houseId, weekStart);
+    return { weekStart, status, assignments };
 }
