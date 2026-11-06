@@ -30,6 +30,8 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 - **Monday rotation:** members are sorted by `rotation_order`. In week `w`, task `i` goes to the member at position `(i + w) mod n`. Extra tasks and rest weeks move around fairly.
 - All tasks count as **equal effort** for now. Task weights could be added later.
 - **Assignments are stored**, one row per task per week, so the calendar history stays correct when people or tasks change. `done_at` empty means not done.
+- **Past weeks and the current week are stored.** Future weeks are **previews**, calculated from the current members and tasks, and never stored.
+- Previews must be **unmistakable** in the UI: labeled "Preview", visually different, with no "done" checkboxes, and a note that they change when members or tasks change.
 
 ### Changes during the week (option B)
 
