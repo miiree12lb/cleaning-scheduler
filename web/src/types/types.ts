@@ -1,4 +1,4 @@
-import type { SessionUser } from "../../../shared/types";
+import type { SessionUser, HouseSummary } from "../../../shared/types";
 
 export interface NavbarItem {
     name: string;
@@ -21,4 +21,9 @@ export type AuthState =
 export type AuthContextValue = {
     auth: AuthState;
     logout: () => Promise<void>;
+};
+
+export type HouseContext = {
+    house: HouseSummary;
+    reloadHouse: () => Promise<void>;
 };

@@ -1,10 +1,9 @@
-import { useOutletContext } from "react-router";
-import type { HouseSummary } from "../../../../shared/types";
+import { useHouse } from "../../utils/useHouse";
 import TasksSection from "./settings/TasksSection";
 import InviteSection from "./settings/InviteSection";
 
 export default function Settings() {
-    const house = useOutletContext<HouseSummary>();
+    const { house, reloadHouse } = useHouse();
 
     return (
         <div className="settings">
