@@ -1,5 +1,6 @@
 import type { WeekPlan } from "../../shared/types";
 import { planWeek } from "./rotation";
+import { mondayOf, dateIn, dateOfTimestamp } from "./weeks";
 
 export type RotationInput = {
     members: { id: number; name: string }[];   // in rotation order
@@ -83,4 +84,16 @@ export async function ensureCurrentWeek(
     );
 
     await db.batch(statements);
+}
+
+export async function loadHouseWeeks(db: D1Database, houseId: number) {
+    const houseDates = await db.prepare("SELECT timezone, created_at FROM houses WHERE id = ?").bind(houseId).first<{ timezone: string, created_at: string }>();
+    if (!houseDates) {
+        return null;
+    }
+    
+    const firstMonday = mondayOf(dateOfTimestamp(houseDates.created_at, houseDates.timezone));
+    const thisMonday = mondayOf(dateIn(houseDates.timezone));
+
+    return { thisMonday, firstMonday };
 }

@@ -44,6 +44,7 @@ Changes apply immediately, but only touch what they have to. Nobody's existing t
 | Member leaves | Their unfinished tasks go to whoever has the fewest |
 | Member joins | Joins the rotation from next Monday |
 | Every Monday | Full rotation with the formula |
+| Member joins | Joins the rotation from next Monday (and shows up in next week's preview right away) |
 
 Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 
@@ -77,3 +78,4 @@ Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 - Shopping list
 - Shared expenses
 - Optional: task weights, dishwasher turns, letting admins reorder the rotation
+- Someone who **joins mid-week** gets no tasks until next Monday. They appear in next week's preview right away.

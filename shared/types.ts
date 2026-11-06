@@ -29,13 +29,13 @@ export type Member = {
 };
 
 export type WeekPlan = {
-    weekStart: string;                          // "YYYY-MM-DD"
+    weekStart: string;
     status: "past" | "current" | "preview";
     assignments: {
         taskId: number;
         taskName: string;
-        userId: number;
-        userName: string;
-        doneAt: string | null;                  // always null in previews
+        userId: number | null;
+        userName: string | null;
+        doneAt: string | null;
     }[];
 };
