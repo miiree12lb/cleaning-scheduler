@@ -1,10 +1,10 @@
-export function todayIn(timeZone: string): string {
+export function dateIn(timeZone: string, moment: Date = new Date()): string {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone,
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-    }).formatToParts(new Date());
+    }).formatToParts(moment);
 
     const get = (type: string) => parts.find((p) => p.type === type)!.value;
     return `${get("year")}-${get("month")}-${get("day")}`;
@@ -30,4 +30,9 @@ export function weeksBetween(fromMonday: string, toMonday: string): number {
     const to = new Date(toMonday + "T00:00:00Z");
     const days = (to.getTime() - from.getTime()) / 86_400_000;
     return Math.round(days/7);
+}
+
+export function dateOfTimestamp(timestamp: string, timeZone: string): string {
+    const moment = new Date(timestamp.replace(" ", "T") + "Z");
+    return dateIn(timeZone, moment);
 }

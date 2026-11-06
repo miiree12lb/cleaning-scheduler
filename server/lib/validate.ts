@@ -1,5 +1,6 @@
 import type { ParseResult } from "../types/types";
 import { type Role, ROLES } from "../../shared/types";
+import { mondayOf } from "./weeks";
 
 export function parseId(value: string | undefined): number | null {
     const id = Number(value);
@@ -47,4 +48,11 @@ export function parseInviteCode(input: string | undefined): string | null {
 
 export function parseRole(input: unknown): Role | null {
     return ROLES.includes(input as Role) ? (input as Role) : null;
+}
+
+export function parseWeekStart(input: string): string | null {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(input) || mondayOf(input) !== input) {
+        return null;
+    }
+    return input;
 }

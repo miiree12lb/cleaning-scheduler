@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addWeeks, mondayOf, todayIn, weeksBetween } from "../../../server/lib/weeks";
+import { addWeeks, mondayOf, dateIn, weeksBetween, dateOfTimestamp } from "../../../server/lib/weeks";
 
 describe("mondayOf", () => {
     it("keeps a Monday as it is", () => {
@@ -72,13 +72,13 @@ describe("weeksBetween", () => {
     });
 });
 
-describe("todayIn", () => {
+describe("dateIn", () => {
     afterEach(() => {
         vi.useRealTimers();
     });
 
     it("returns a date in YYYY-MM-DD format", () => {
-        expect(todayIn("Europe/Berlin")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(dateIn("Europe/Berlin")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
     it("uses the house's timezone, not UTC", () => {
@@ -86,14 +86,26 @@ describe("todayIn", () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2026-11-08T23:30:00Z"));
 
-        expect(todayIn("UTC")).toBe("2026-11-08");
-        expect(todayIn("Europe/Berlin")).toBe("2026-11-09");
+        expect(dateIn("UTC")).toBe("2026-11-08");
+        expect(dateIn("Europe/Berlin")).toBe("2026-11-09");
     });
 
     it("puts Monday-just-after-midnight in the new week", () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2026-11-08T23:30:00Z"));
 
-        expect(mondayOf(todayIn("Europe/Berlin"))).toBe("2026-11-09");
+        expect(mondayOf(dateIn("Europe/Berlin"))).toBe("2026-11-09");
+    });
+});
+
+describe("dateOfTimestamp", () => {
+    it("reads the database time as UTC", () => {
+        expect(dateOfTimestamp("2026-11-05 21:20:14", "UTC")).toBe("2026-11-05");
+    });
+
+    it("converts to the house's timezone", () => {
+        // 23:30 UTC on Sunday is 00:30 on Monday in Berlin
+        expect(dateOfTimestamp("2026-11-08 23:30:00", "Europe/Berlin")).toBe("2026-11-09");
+        expect(dateOfTimestamp("2026-11-08 23:30:00", "UTC")).toBe("2026-11-08");
     });
 });

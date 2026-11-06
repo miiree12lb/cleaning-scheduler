@@ -27,3 +27,15 @@ export type Member = {
     role: Role;
     uses_dishwasher: number;
 };
+
+export type WeekPlan = {
+    weekStart: string;                          // "YYYY-MM-DD"
+    status: "past" | "current" | "preview";
+    assignments: {
+        taskId: number;
+        taskName: string;
+        userId: number;
+        userName: string;
+        doneAt: string | null;                  // always null in previews
+    }[];
+};
