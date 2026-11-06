@@ -187,3 +187,54 @@ export async function assignTaskThisWeek(db: D1Database, houseId: number, taskId
         .bind(houseId, thisMonday, taskId, target.userId)
         .run();
 }
+
+export async function removeTaskThisWeek(db: D1Database, houseId: number, taskId: number): Promise<void> {
+    const info = await loadHouseWeeks(db, houseId);
+    if (!info) return;
+
+    await db
+        .prepare(
+            `DELETE FROM assignments
+             WHERE house_id = ? AND week_start = ? AND task_id = ? AND done_at IS NULL`,
+        )
+        .bind(houseId, info.thisMonday, taskId)
+        .run();
+}
+
+export async function reassignUnfinished(db: D1Database, houseId: number, leavingUserId: number): Promise<void> {
+    const info = await loadHouseWeeks(db, houseId);
+    if (!info) return;
+
+    const { results: unfinished } = await db
+        .prepare(
+            `SELECT task_id AS taskId FROM assignments
+             WHERE house_id = ? AND week_start = ? AND user_id = ? AND done_at IS NULL`,
+        )
+        .bind(houseId, info.thisMonday, leavingUserId)
+        .all<{ taskId: number }>();
+
+    if (unfinished.length === 0) return;
+
+    const statements = unfinished.map((row) =>
+        db
+            .prepare(
+                `UPDATE assignments
+                 SET user_id = (
+                     SELECT house_members.user_id
+                     FROM house_members
+                     LEFT JOIN assignments AS a
+                         ON a.user_id = house_members.user_id
+                        AND a.house_id = house_members.house_id
+                        AND a.week_start = ?
+                     WHERE house_members.house_id = ?
+                     GROUP BY house_members.user_id
+                     ORDER BY COUNT(a.id), house_members.rotation_order
+                     LIMIT 1
+                 )
+                 WHERE house_id = ? AND week_start = ? AND task_id = ? AND done_at IS NULL`,
+            )
+            .bind(info.thisMonday, houseId, houseId, info.thisMonday, row.taskId),
+    );
+
+    await db.batch(statements);
+}

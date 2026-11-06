@@ -1,4 +1,6 @@
 import type { RemoveResult } from "../types/types";
+import { reassignUnfinished } from "./schedule";
+
 export async function removeMember(
     db: D1Database,
     houseId: number,
@@ -17,7 +19,7 @@ export async function removeMember(
         .run();
 
     if (result.meta.changes === 1) {
-        // TODO: reassign this week's unfinished tasks (rotation step)
+        await reassignUnfinished(db, houseId, userId);
         return "removed";
     }
 

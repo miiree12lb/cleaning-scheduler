@@ -4,7 +4,7 @@ import { requireAuth } from "../lib/auth";
 import { requireAdmin, requireMember } from "../lib/membership";
 import type { Task } from "../../shared/types";
 import { parseDescription, parseName, parseId } from "../lib/validate";
-import { assignTaskThisWeek } from "../lib/schedule";
+import { assignTaskThisWeek, removeTaskThisWeek } from "../lib/schedule";
 
 const tasks = new Hono<AppEnv>();
 tasks.use(requireAuth, requireMember);
@@ -110,7 +110,7 @@ tasks.delete("/:taskId", requireAdmin, async (c) => {
     }
 
     await c.env.DB.prepare("UPDATE tasks SET active = 0 WHERE id = ?").bind(taskId).run();
-    // TODO (next mid-week rule): remove this week's assignment, unless it's already done
+    await removeTaskThisWeek(c.env.DB, houseId, taskId);
     return c.json({ result: "archived" });
 });
 
