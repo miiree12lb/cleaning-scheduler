@@ -5,6 +5,8 @@ import { requireMember } from "../lib/membership";
 import { parseWeekStart } from "../lib/validate";
 import { mondayOf, dateIn, weeksBetween, dateOfTimestamp } from "../lib/weeks";
 import type { WeekPlan } from "../../shared/types";
+import { planWeek } from "../lib/rotation"; 
+import { loadRotationInput } from "../lib/schedule";
 
 const weeks = new Hono<AppEnv>();
 weeks.use(requireAuth, requireMember);
@@ -28,7 +30,31 @@ weeks.get("/:weekStart", async (c) => {
     const status: WeekPlan["status"] =
         weekStart < thisMonday ? "past" : weekStart === thisMonday ? "current" : "preview";
 
+    if (status === "preview") {
+        const { members, tasks } = await loadRotationInput(c.env.DB, houseId);
+
+        const planned = planWeek(
+            members.map((m) => m.id),
+            tasks.map((t) => t.id),
+            week,
+        );
+
+        const memberNames = new Map(members.map((m) => [m.id, m.name]));
+        const taskNames = new Map(tasks.map((t) => [t.id, t.name]));
+
+        const assignments = planned.map((a) => ({
+            taskId: a.taskId,
+            taskName: taskNames.get(a.taskId) ?? "Unknown task",
+            userId: a.userId,
+            userName: memberNames.get(a.userId) ?? "Unknown member",
+            doneAt: null,
+        }));
+
+        return c.json({ weekStart, status, assignments });
+    }
+
     return c.json({ weekStart, status, week, assignments: [] });
+
 });
 
 export default weeks;
