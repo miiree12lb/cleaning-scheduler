@@ -31,11 +31,17 @@ export type Member = {
 export type WeekPlan = {
     weekStart: string;
     status: "past" | "current" | "preview";
+    currentWeekStart: string;
+    firstWeekStart: string;
     assignments: {
         taskId: number;
         taskName: string;
         userId: number | null;
         userName: string | null;
         doneAt: string | null;
+        doneById: number | null;
+        doneByName: string | null;
     }[];
 };
+
+export type Assignment = WeekPlan["assignments"][number];

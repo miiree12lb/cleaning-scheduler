@@ -33,18 +33,21 @@ export async function readStoredWeek(
     weekStart: string,
 ): Promise<WeekPlan["assignments"]> {
     const { results } = await db
-        .prepare(
-            `SELECT assignments.task_id AS taskId,
-                    tasks.name          AS taskName,
-                    assignments.user_id AS userId,
-                    users.name          AS userName,
-                    assignments.done_at AS doneAt
-             FROM assignments
-             JOIN tasks ON tasks.id = assignments.task_id
-             LEFT JOIN users ON users.id = assignments.user_id
-             WHERE assignments.house_id = ? AND assignments.week_start = ?
-             ORDER BY tasks.id`,
-        )
+        .prepare(`
+            SELECT assignments.task_id AS taskId,
+                tasks.name AS taskName,
+                assignments.user_id AS userId,
+                assignee.name AS userName,
+                assignments.done_at AS doneAt,
+                assignments.done_by AS doneById,
+                doer.name AS doneByName
+            FROM assignments
+            JOIN tasks ON tasks.id = assignments.task_id
+            LEFT JOIN users AS assignee ON assignee.id = assignments.user_id
+            LEFT JOIN users AS doer     ON doer.id     = assignments.done_by
+            WHERE assignments.house_id = ? AND assignments.week_start = ?
+            ORDER BY tasks.id
+        `)
         .bind(houseId, weekStart)
         .all<WeekPlan["assignments"][number]>();
 
@@ -127,9 +130,11 @@ export async function getWeekPlan(
             userId: a.userId,
             userName: memberNames.get(a.userId) ?? "Unknown member",
             doneAt: null,
+            doneById: null,
+            doneByName: null,
         }));
 
-        return { weekStart, status, assignments };
+        return { weekStart, status, currentWeekStart: info.thisMonday, firstWeekStart: info.firstMonday, assignments };
     }
 
     if (status === "current") {
@@ -137,7 +142,7 @@ export async function getWeekPlan(
     }
 
     const assignments = await readStoredWeek(db, houseId, weekStart);
-    return { weekStart, status, assignments };
+    return { weekStart, status, currentWeekStart: info.thisMonday, firstWeekStart: info.firstMonday, assignments };
 }
 
 export async function assignTaskThisWeek(db: D1Database, houseId: number, taskId: number): Promise<void> {
