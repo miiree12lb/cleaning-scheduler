@@ -105,3 +105,14 @@ Never edit a migration that has been applied with `--remote`. Create a new one i
 
 - Windows PowerShell 5.1 doesn't support `&&`. Run commands on separate lines (inside npm scripts, `&&` works fine).
 - `echo "..." > file` writes UTF-16 in PowerShell 5.1. Create text files like `.gitignore` in your editor instead, and save them as UTF-8.
+
+## Deploy
+
+npx wrangler d1 migrations apply cleaning-db --remote   # only when there are new migrations
+npm --prefix web run build
+cd web
+npx wrangler deploy --config dist/cleaning_scheduler/wrangler.json
+cd ..
+
+# Check: this must answer {"error":"Not found"}
+# https://cleaning-scheduler.miiree12lb.workers.dev/api/auth/dev-login/1
