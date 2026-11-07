@@ -1,6 +1,5 @@
 import { Link, NavLink } from "react-router";
 import {
-    CalendarCheck,
     CalendarDays,
     LogOut,
     ScrollText,
@@ -23,8 +22,7 @@ type NavItem = {
 };
 
 const ITEMS: NavItem[] = [
-    { name: "This week", short: "Week", link: ".", icon: CalendarCheck, end: true },
-    { name: "Calendar", short: "Calendar", link: "calendar", icon: CalendarDays },
+    { name: "Calendar", short: "Calendar", link: ".", icon: CalendarDays },
     { name: "Dishwasher", short: "Dishes", link: "dishwasher", icon: UtensilsCrossed },
     { name: "House Rules", short: "Rules", link: "rules", icon: ScrollText },
 ];

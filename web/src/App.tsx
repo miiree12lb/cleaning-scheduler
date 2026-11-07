@@ -7,14 +7,13 @@ import RequireAuth from "./auth/RequireAuth";
 import Layout from "./utils/Layout";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Current from "./pages/house/Current";
 import Calendar from "./pages/house/Calendar";
 import Dishwasher from "./pages/house/Dishwasher";
 import Rules from "./pages/house/Rules";
 import Home from "./pages/Home";
 import CreateHouse from "./pages/CreateHouse";
 import Settings from "./pages/house/Settings";
-import JoinHouse from"./pages/JoinHouse";
+import JoinHouse from "./pages/JoinHouse";
 import Account from "./pages/Account";
 
 export default function App() {
@@ -52,7 +51,7 @@ export default function App() {
                         path="/houses/:houseId"
                         element={<Layout theme={theme} toggleTheme={toggleTheme} />}
                     >
-                        <Route index element={<Current />} />
+                        <Route index element={<Calendar />} />
                         <Route path="calendar" element={<Calendar />} />
                         <Route path="dishwasher" element={<Dishwasher />} />
                         <Route path="rules" element={<Rules />} />
