@@ -96,3 +96,32 @@ export function parseRuleText(input: unknown): ParseResult<string> {
 
     return { ok: true, value: rule };
 }
+
+// Passwords are not trimmed: spaces are allowed and count
+export function parsePassword(input: unknown): ParseResult<string> {
+    if (typeof input !== "string") {
+        return { ok: false, error: "Password must be text" };
+    }
+    if (input.length < 10) {
+        return { ok: false, error: "Password must have at least 10 characters" };
+    }
+    if (input.length > 200) {
+        return { ok: false, error: "Password cannot have more than 200 characters" };
+    }
+
+    return { ok: true, value: input };
+}
+
+// Emails are compared without capitals, so they're stored in lowercase
+export function parseEmail(input: unknown): ParseResult<string> {
+    if (typeof input !== "string") {
+        return { ok: false, error: "Email must be text" };
+    }
+
+    const email = input.trim().toLowerCase();
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { ok: false, error: "That doesn't look like an email address" };
+    }
+
+    return { ok: true, value: email };
+}

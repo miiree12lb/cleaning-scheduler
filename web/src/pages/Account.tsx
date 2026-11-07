@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import ConfirmDialog from "../utils/ConfirmDialog";
 import "../css/settings.css";
@@ -57,7 +57,18 @@ export default function Account() {
                     <dt>Email</dt>
                     <dd>{user.email}</dd>
                 </dl>
-                <p className="section-hint">Your name and email come from your Google account.</p>
+            </section>
+
+            <section className="settings-section">
+                <header className="section-header">
+                    <h2>Log out</h2>
+                </header>
+                <p className="section-hint">Log out on this device. Your account and houses stay as they are.</p>
+
+                <button type="button" className="secondary-button" onClick={logout}>
+                    <LogOut size={16} aria-hidden="true" />
+                    Log out
+                </button>
             </section>
 
             <section className="settings-section danger-zone">

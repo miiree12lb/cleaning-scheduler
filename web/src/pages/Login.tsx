@@ -1,5 +1,6 @@
 import { Navigate, useSearchParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import PasswordForm from "./login/PasswordForm";
 import "../css/login.css";
 
 const ERRORS: Record<string, string> = {
@@ -46,6 +47,12 @@ export default function Login() {
                 <a className="google-button" href={loginUrl}>
                     Sign in with Google
                 </a>
+
+                   <div className="login-divider">
+                        <span>or</span>
+                    </div>
+
+                    <PasswordForm returnTo={returnTo ?? "/"} />
             </div>
         </div>
     );
