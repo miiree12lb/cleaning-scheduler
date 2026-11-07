@@ -6,6 +6,7 @@ const ERRORS: Record<string, string> = {
     cancelled: "Sign-in was cancelled.",
     failed: "Sign-in didn't work. Please try again.",
     email_in_use: "This email address already belongs to another account.",
+    too_many: "Too many login attempts. Wait a minute and try again.",
 };
 
 export default function Login() {

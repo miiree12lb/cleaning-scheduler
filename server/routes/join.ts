@@ -3,12 +3,12 @@ import type { AppEnv } from "../types/types";
 import type { Role } from "../../shared/types";
 import { requireAuth } from "../lib/auth";
 import { parseInviteCode } from "../lib/validate";
-import type { HouseSummary } from "../../shared/types";
+import { rateLimit } from "../lib/rateLimit";
 
 const join = new Hono<AppEnv>();
 join.use(requireAuth);
 
-join.post("/:code", async (c) => {
+join.post("/:code", rateLimit("JOIN_LIMITER"), async (c) => {
     const code = parseInviteCode(c.req.param("code"));
     if (code === null) {
         return c.json({ error: "Invalid invite code" }, 400);

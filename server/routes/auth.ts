@@ -2,11 +2,11 @@ import { Hono } from "hono";
 import { requireAuth } from "../lib/auth";
 import { type AppEnv } from "../types/types";
 import { setCookie, deleteCookie, getCookie } from "hono/cookie";
-import { deleteSession } from "../lib/session";
+import { SESSION_DAYS, createSession, deleteSession } from "../lib/session";
 import { randomHex } from "../lib/random";
-import { SESSION_DAYS, createSession } from "../lib/session";
 import { exchangeCode } from "../lib/google";
 import { removeMember } from "../lib/members";
+import { rateLimit } from "../lib/rateLimit";
 
 const auth = new Hono<AppEnv>();
 
@@ -52,7 +52,7 @@ auth.delete("/me", requireAuth, async (c) => {
     return c.json({ ok: true });
 });
 
-auth.get("/login", (c) => {
+auth.get("/login", rateLimit("AUTH_LIMITER", "redirect"), (c) => {
     const state = randomHex(16);
     const secure = new URL(c.req.url).protocol === "https:";
 
@@ -89,7 +89,7 @@ auth.get("/login", (c) => {
     return c.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
-auth.get("/callback", async (c) => {
+auth.get("/callback", rateLimit("AUTH_LIMITER", "redirect"), async (c) => {
     const secure = new URL(c.req.url).protocol === "https:";
 
     // Read and clear the short-lived login cookies
@@ -149,6 +149,7 @@ auth.get("/callback", async (c) => {
     }
 
     // 4. Start a session
+    await c.env.DB.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
     const sessionId = await createSession(c.env.DB, user.id);
     setCookie(c, "session", sessionId, {
         path: "/",
@@ -167,7 +168,7 @@ auth.post("/logout", async (c) => {
     if (sessionId) {
         await deleteSession(c.env.DB, sessionId);
     }
-    deleteCookie(c, "session");
+    deleteCookie(c, "session", { path: "/" });
     return c.json({ ok: true });
 });
 

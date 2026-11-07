@@ -9,8 +9,11 @@ import join from "./routes/join";
 import members from "./routes/members";
 import weeks from "./routes/weeks";
 import rules from "./routes/rules";
+import { secureHeaders } from "hono/secure-headers";
+
 
 const app = new Hono<AppEnv>().basePath("/api");
+app.use("*", secureHeaders());
 
 app.route("/health", health);
 app.route("/auth", auth);
