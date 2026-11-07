@@ -109,10 +109,11 @@ Never edit a migration that has been applied with `--remote`. Create a new one i
 ## Deploy
 
 npx wrangler d1 migrations apply cleaning-db --remote   # only when there are new migrations
-npm --prefix web run build
-cd web
-npx wrangler deploy --config dist/cleaning_scheduler/wrangler.json
-cd ..
+npm run deploy
+npx wrangler tail                                       # live logs of the deployed app
 
-# Check: this must answer {"error":"Not found"}
+# Secrets (set once, or when they change; paste the value at the prompt):
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+# Never set DEV_LOGIN in production. This must answer {"error":"Not found"}:
 # https://cleaning-scheduler.miiree12lb.workers.dev/api/auth/dev-login/1

@@ -1,11 +1,10 @@
 import { Link, NavLink } from "react-router";
 import {
-    CalendarCheck,
     CalendarDays,
     LogOut,
     ScrollText,
     Settings as SettingsIcon,
-    UtensilsCrossed,
+    ListChecks,
     type LucideIcon,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
@@ -23,9 +22,8 @@ type NavItem = {
 };
 
 const ITEMS: NavItem[] = [
-    { name: "This week", short: "Week", link: ".", icon: CalendarCheck, end: true },
-    { name: "Calendar", short: "Calendar", link: "calendar", icon: CalendarDays },
-    { name: "Dishwasher", short: "Dishes", link: "dishwasher", icon: UtensilsCrossed },
+    { name: "Calendar", short: "Calendar", link: ".", icon: CalendarDays, end: true },
+    { name: "Tasks", short: "Tasks", link: "tasks", icon: ListChecks },
     { name: "House Rules", short: "Rules", link: "rules", icon: ScrollText },
 ];
 

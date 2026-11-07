@@ -30,10 +30,18 @@ export async function exchangeCode(
             grant_type: "authorization_code",
         }),
     });
-    if (!res.ok) return null;
+
+    if (!res.ok) {
+        // Google explains what's wrong, e.g. {"error":"invalid_client"} or {"error":"redirect_uri_mismatch"}
+        console.error("Token exchange failed:", res.status, await res.text());
+        return null;
+    }
 
     const tokens: { id_token?: string } = await res.json();
-    if (!tokens.id_token) return null;
+    if (!tokens.id_token) {
+        console.error("Token exchange returned no id_token");
+        return null;
+    }
 
     const claims = decodeJwtPayload(tokens.id_token);
 
@@ -44,6 +52,7 @@ export async function exchangeCode(
     const emailOk = typeof claims.email === "string" && claims.email_verified === true;
 
     if (!issuerOk || !audienceOk || !notExpired || !emailOk || typeof claims.sub !== "string") {
+        console.error("ID token rejected:", { issuerOk, audienceOk, notExpired, emailOk, hasSub: typeof claims.sub === "string" });
         return null;
     }
 

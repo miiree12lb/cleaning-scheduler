@@ -19,6 +19,14 @@ export async function removeMember(
         .run();
 
     if (result.meta.changes === 1) {
+        await db
+        .prepare(
+            `DELETE FROM section_members
+             WHERE user_id = ?
+               AND section_id IN (SELECT id FROM rule_sections WHERE house_id = ?)`,
+        )
+        .bind(userId, houseId)
+        .run();
         await reassignUnfinished(db, houseId, userId);
         return "removed";
     }

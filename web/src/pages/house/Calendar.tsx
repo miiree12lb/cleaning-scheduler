@@ -89,7 +89,7 @@ export default function Calendar() {
                 <WeekView
                     plan={plan}
                     myId={myId}
-                    onToggle={plan.status === "current" ? toggleDone : undefined}
+                    onToggle={plan.canMark ? toggleDone : undefined}
                     busyTaskId={busyTaskId}
                 />
             </div>
