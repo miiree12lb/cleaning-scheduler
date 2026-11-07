@@ -1,6 +1,6 @@
 import { useState, type FormEvent, useId } from "react";
 import { Plus } from "lucide-react";
-import type { Task } from "../../../../../../shared/types";
+import type { Task } from "../../../../../shared/types";
 
 type Props = {
     houseId: number;

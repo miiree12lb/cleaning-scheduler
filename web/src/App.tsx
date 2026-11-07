@@ -14,6 +14,7 @@ import CreateHouse from "./pages/CreateHouse";
 import Settings from "./pages/house/Settings";
 import JoinHouse from "./pages/JoinHouse";
 import Account from "./pages/Account";
+import Tasks from "./pages/house/Tasks";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -52,6 +53,7 @@ export default function App() {
                     >
                         <Route index element={<Calendar />} />
                         <Route path="calendar" element={<Calendar />} />
+                        <Route path="tasks" element={<Tasks />} />
                         <Route path="rules" element={<Rules />} />
                         <Route path="settings" element={<Settings />} />
                     </Route>

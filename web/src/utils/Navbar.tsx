@@ -4,6 +4,7 @@ import {
     LogOut,
     ScrollText,
     Settings as SettingsIcon,
+    ListChecks,
     type LucideIcon,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
@@ -22,6 +23,7 @@ type NavItem = {
 
 const ITEMS: NavItem[] = [
     { name: "Calendar", short: "Calendar", link: ".", icon: CalendarDays, end: true },
+    { name: "Tasks", short: "Tasks", link: "tasks", icon: ListChecks },
     { name: "House Rules", short: "Rules", link: "rules", icon: ScrollText },
 ];
 
