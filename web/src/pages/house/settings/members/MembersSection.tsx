@@ -7,7 +7,6 @@ import { useHouse } from "../../../../utils/useHouse";
 import { useRefreshOnFocus } from "../../../../utils/useRefreshOnFocus";
 import { readError } from "../../../../utils/readError";
 import ConfirmDialog from "../../../../utils/ConfirmDialog";
-import Switch from "../../../../utils/Switch";
 
 type Props = {
     houseId: number;
@@ -21,7 +20,6 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
     const [loadError, setLoadError] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
     const [busyId, setBusyId] = useState<number | null>(null);
-    const [savingDishwasher, setSavingDishwasher] = useState(false);
     const [confirmingLeave, setConfirmingLeave] = useState(false);
     const [confirmingStepDown, setConfirmingStepDown] = useState(false);
     const [pendingRemoval, setPendingRemoval] = useState<Member | null>(null);
@@ -56,32 +54,6 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
 
     const refreshMembers = useCallback(() => loadMembers(false), [loadMembers]);
     useRefreshOnFocus(refreshMembers);
-
-    async function setUsesDishwasher(value: boolean) {
-        setSavingDishwasher(true);
-        setActionError(null);
-        try {
-            const res = await fetch(`/api/houses/${houseId}/members/me`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ uses_dishwasher: value }),
-            });
-            if (!res.ok) {
-                setActionError(await readError(res, "Could not save your dishwasher setting."));
-                return;
-            }
-            const data: { uses_dishwasher: number } = await res.json();
-            setMembers((prev) =>
-                prev === null
-                    ? prev
-                    : prev.map((m) => (m.id === myId ? { ...m, uses_dishwasher: data.uses_dishwasher } : m)),
-            );
-        } catch {
-            setActionError("Could not reach the server.");
-        } finally {
-            setSavingDishwasher(false);
-        }
-    }
 
     async function leaveHouse() {
         setActionError(null);
@@ -184,22 +156,7 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                             </div>
 
                             <div className="member-meta">
-                                {isMe ? (
-                                    <Switch
-                                        checked={member.uses_dishwasher === 1}
-                                        onChange={setUsesDishwasher}
-                                        label="I use the dishwasher"
-                                        disabled={savingDishwasher}
-                                    />
-                                ) : (
-                                    member.uses_dishwasher === 1 && (
-                                        <span className="picker-badge">Uses dishwasher</span>
-                                    )
-                                )}
-                            
-
                                 {member.role === "admin" && <span className="picker-badge">Admin</span>}
-                            
 
                                 <div className="task-actions">
                                     {isAdmin && !isMe && (

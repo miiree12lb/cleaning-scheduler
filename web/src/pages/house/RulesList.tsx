@@ -1,61 +1,38 @@
-import { useCallback, useEffect, useId, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
-import type { Rule, RuleKind } from "../../../../shared/types";
+import type { Rule } from "../../../../shared/types";
 import ConfirmDialog from "../../utils/ConfirmDialog";
 import { readError } from "../../utils/readError";
-import { useRefreshOnFocus } from "../../utils/useRefreshOnFocus";
-import "../../css/settings.css";
-import "../../css/rules.css";
 
 type Props = {
     houseId: number;
-    kind: RuleKind;
+    sectionId: number;
+    rules: Rule[];
     isAdmin: boolean;
-    emptyText: string;
+    onChange: (rules: Rule[]) => void;
 };
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
-export default function RulesList({ houseId, kind, isAdmin, emptyText }: Props) {
-    const [rules, setRules] = useState<Rule[] | null>(null);
-    const [loadError, setLoadError] = useState(false);
+export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange }: Props) {
     const [actionError, setActionError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [pendingDelete, setPendingDelete] = useState<Rule | null>(null);
 
-    const loadRules = useCallback(async () => {
-        setLoadError(false);
-        try {
-            const res = await fetch(`/api/houses/${houseId}/rules?kind=${kind}`);
-            if (!res.ok) {
-                setLoadError(true);
-                return;
-            }
-            const data: Rule[] = await res.json();
-            setRules(data);
-        } catch {
-            setLoadError(true);
-        }
-    }, [houseId, kind]);
-
-    useEffect(() => {
-        loadRules();
-    }, [loadRules]);
-
-    useRefreshOnFocus(loadRules);
+    const api = `/api/houses/${houseId}/rules`;
 
     // Returns an error message, or null when it worked
     async function addRule(text: string): Promise<string | null> {
         try {
-            const res = await fetch(`/api/houses/${houseId}/rules`, {
+            const res = await fetch(`${api}/sections/${sectionId}/rules`, {
                 method: "POST",
                 headers: JSON_HEADERS,
-                body: JSON.stringify({ kind, text }),
+                body: JSON.stringify({ text }),
             });
             if (!res.ok) return await readError(res, "Could not add the rule.");
             const rule: Rule = await res.json();
-            setRules((prev) => (prev === null ? [rule] : [...prev, rule]));
+            onChange([...rules, rule]);
             return null;
         } catch {
             return "Could not reach the server.";
@@ -64,14 +41,14 @@ export default function RulesList({ houseId, kind, isAdmin, emptyText }: Props) 
 
     async function saveRule(rule: Rule, text: string): Promise<string | null> {
         try {
-            const res = await fetch(`/api/houses/${houseId}/rules/${rule.id}`, {
+            const res = await fetch(`${api}/rules/${rule.id}`, {
                 method: "PATCH",
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ text }),
             });
             if (!res.ok) return await readError(res, "Could not save the rule.");
             const saved: Rule = await res.json();
-            setRules((prev) => (prev === null ? prev : prev.map((r) => (r.id === saved.id ? saved : r))));
+            onChange(rules.map((r) => (r.id === saved.id ? saved : r)));
             setEditingId(null);
             return null;
         } catch {
@@ -83,12 +60,12 @@ export default function RulesList({ houseId, kind, isAdmin, emptyText }: Props) 
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/rules/${rule.id}`, { method: "DELETE" });
+            const res = await fetch(`${api}/rules/${rule.id}`, { method: "DELETE" });
             if (!res.ok) {
                 setActionError(await readError(res, "Could not delete the rule."));
                 return;
             }
-            setRules((prev) => (prev === null ? prev : prev.filter((r) => r.id !== rule.id)));
+            onChange(rules.filter((r) => r.id !== rule.id));
         } catch {
             setActionError("Could not reach the server.");
         } finally {
@@ -97,40 +74,37 @@ export default function RulesList({ houseId, kind, isAdmin, emptyText }: Props) 
     }
 
     async function move(index: number, direction: -1 | 1) {
-        if (rules === null) return;
         const target = index + direction;
         if (target < 0 || target >= rules.length) return;
 
         // Show the new order right away, then save it
+        const previous = rules;
         const reordered = [...rules];
         [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
-        setRules(reordered);
+        onChange(reordered);
 
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/rules/order`, {
+            const res = await fetch(`${api}/sections/${sectionId}/rules/order`, {
                 method: "PUT",
                 headers: JSON_HEADERS,
-                body: JSON.stringify({ kind, ids: reordered.map((r) => r.id) }),
+                body: JSON.stringify({ ids: reordered.map((r) => r.id) }),
             });
             if (!res.ok) {
                 setActionError(await readError(res, "Could not save the new order."));
-                await loadRules(); // go back to what the server has
+                onChange(previous); // put the old order back
                 return;
             }
             const saved: Rule[] = await res.json();
-            setRules(saved);
+            onChange(saved);
         } catch {
             setActionError("Could not reach the server.");
-            await loadRules();
+            onChange(previous);
         } finally {
             setBusy(false);
         }
     }
-
-    if (loadError) return <p className="section-error">Could not load the rules.</p>;
-    if (rules === null) return null;
 
     return (
         <div className="rules">
@@ -141,7 +115,7 @@ export default function RulesList({ houseId, kind, isAdmin, emptyText }: Props) 
             )}
 
             {rules.length === 0 ? (
-                <p className="rules-empty">{emptyText}</p>
+                <p className="rules-empty">No rules in this section yet.</p>
             ) : (
                 <ol className="rules-list">
                     {rules.map((rule, index) =>

@@ -1,10 +1,17 @@
 import type { ParseResult } from "../types/types";
-import { type Role, ROLES, type Rule, type RuleKind } from "../../shared/types";
+import { type Role, ROLES } from "../../shared/types";
 import { mondayOf } from "./weeks";
 
 export function parseId(value: string | undefined): number | null {
     const id = Number(value);
     return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+// A list of ids from a JSON body, e.g. for reordering: [5, 2, 8]
+export function parseIdList(input: unknown): number[] | null {
+    if (!Array.isArray(input)) return null;
+    const ids = input.map((value) => parseId(String(value)));
+    return ids.every((id) => id !== null) ? (ids as number[]) : null;
 }
 
 export function parseName(input: unknown): ParseResult<string> {
@@ -27,14 +34,14 @@ export function parseDescription(input: unknown): ParseResult<string | null> {
     if (input === undefined || input === null) {
         return { ok: true, value: null };
     }
-    
+
     if (typeof input !== "string") {
         return { ok: false, error: "Description must be text" };
     }
 
     const trimmed = input.trim();
     if (trimmed.length > 200) {
-        return { ok: false,  error: "Description cannot have more than 200 characters" };
+        return { ok: false, error: "Description cannot have more than 200 characters" };
     }
 
     return { ok: true, value: trimmed === "" ? null : trimmed };
@@ -57,11 +64,21 @@ export function parseWeekStart(input: string): string | null {
     return input;
 }
 
-export function parseRuleKind(input: unknown): RuleKind | null {
-    if (input === "house" || input === "dishwasher") {
-        return input;
+// A rule section's name, like "General" or "Dishwasher"
+export function parseSectionName(input: unknown): ParseResult<string> {
+    if (typeof input !== "string") {
+        return { ok: false, error: "Section name must be text" };
     }
-    return null;
+
+    const name = input.trim();
+    if (name.length === 0) {
+        return { ok: false, error: "Section name cannot be empty" };
+    }
+    if (name.length > 40) {
+        return { ok: false, error: "Section name cannot have more than 40 characters" };
+    }
+
+    return { ok: true, value: name };
 }
 
 export function parseRuleText(input: unknown): ParseResult<string> {

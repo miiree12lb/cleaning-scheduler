@@ -47,7 +47,7 @@ houses.get("/:id", async (c) => {
 
 houses.post("/", async (c) => {
     const user = c.get("user");
-    
+
     let body;
     try {
         body = await c.req.json();
@@ -61,12 +61,20 @@ houses.post("/", async (c) => {
     }
     const name = nameResult.value;
 
+    // The invite code is unique, so it identifies the new house in the statements below
+    const inviteCode = randomHex(5);
+    const newHouseId = "(SELECT id FROM houses WHERE invite_code = ?)";
+
     const results = await c.env.DB.batch([
-        c.env.DB.prepare("INSERT INTO houses (name, invite_code) VALUES (?, ?)")
-            .bind(name, randomHex(5)),
+        c.env.DB.prepare("INSERT INTO houses (name, invite_code) VALUES (?, ?)").bind(name, inviteCode),
         c.env.DB.prepare(
-            "INSERT INTO house_members (house_id, user_id, role, rotation_order) VALUES (last_insert_rowid(), ?, 'admin', 0)",
-        ).bind(user.id),
+            `INSERT INTO house_members (house_id, user_id, role, rotation_order)
+             VALUES (${newHouseId}, ?, 'admin', 0)`,
+        ).bind(inviteCode, user.id),
+        c.env.DB.prepare(
+            `INSERT INTO rule_sections (house_id, name, position, opt_in)
+             VALUES (${newHouseId}, 'General', 0, 0)`,
+        ).bind(inviteCode),
     ]);
 
     const houseId = results[0].meta.last_row_id;

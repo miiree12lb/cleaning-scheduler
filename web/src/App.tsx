@@ -8,7 +8,6 @@ import Layout from "./utils/Layout";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Calendar from "./pages/house/Calendar";
-import Dishwasher from "./pages/house/Dishwasher";
 import Rules from "./pages/house/Rules";
 import Home from "./pages/Home";
 import CreateHouse from "./pages/CreateHouse";
@@ -53,7 +52,6 @@ export default function App() {
                     >
                         <Route index element={<Calendar />} />
                         <Route path="calendar" element={<Calendar />} />
-                        <Route path="dishwasher" element={<Dishwasher />} />
                         <Route path="rules" element={<Rules />} />
                         <Route path="settings" element={<Settings />} />
                     </Route>
