@@ -240,10 +240,13 @@ rules.post("/sections/:sectionId/rules", requireAdmin, async (c) => {
         return c.json({ error: "Section not found" }, 404);
     }
 
-    const duplicate = await c.env.DB.prepare("SELECT 1 FROM rules WHERE house_id = ? AND text = ? COLLATE NOCASE")
-        .bind(houseId, text)
+    // The same rule may appear in different sections, but only once per section
+    const duplicate = await c.env.DB.prepare(
+        "SELECT 1 FROM rules WHERE section_id = ? AND text = ? COLLATE NOCASE",
+    )
+        .bind(sectionId, text)
         .first();
-    if (duplicate) return c.json({ error: "This rule already exists" }, 409);
+    if (duplicate) return c.json({ error: "This rule already exists in this section" }, 409);
 
     const rule = await c.env.DB.prepare(
         `INSERT INTO rules (house_id, section_id, text, position)
@@ -317,12 +320,17 @@ rules.patch("/rules/:ruleId", requireAdmin, async (c) => {
 
     const { houseId } = c.get("membership");
 
+    // Another rule with this text in the same section? The subquery finds this rule's section
+    // (only if it belongs to this house).
     const duplicate = await c.env.DB.prepare(
-        "SELECT 1 FROM rules WHERE house_id = ? AND text = ? COLLATE NOCASE AND id != ?",
+        `SELECT 1 FROM rules
+         WHERE section_id = (SELECT section_id FROM rules WHERE id = ? AND house_id = ?)
+           AND text = ? COLLATE NOCASE
+           AND id != ?`,
     )
-        .bind(houseId, text, ruleId)
+        .bind(ruleId, houseId, text, ruleId)
         .first();
-    if (duplicate) return c.json({ error: "This rule already exists" }, 409);
+    if (duplicate) return c.json({ error: "This rule already exists in this section" }, 409);
 
     const rule = await c.env.DB.prepare(
         `UPDATE rules SET text = ?, updated_at = datetime('now')
