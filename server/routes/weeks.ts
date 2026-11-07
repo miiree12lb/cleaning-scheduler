@@ -4,6 +4,7 @@ import { requireAuth } from "../lib/auth";
 import { requireMember } from "../lib/membership";
 import { parseWeekStart, parseId } from "../lib/validate";
 import {readStoredWeek, loadHouseWeeks, getWeekPlan } from "../lib/schedule";
+import { addWeeks } from "../lib/weeks";
 
 const weeks = new Hono<AppEnv>();
 weeks.use(requireAuth, requireMember);
@@ -50,8 +51,9 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
         return c.json({ error: "House not found" }, 404);
     }
 
-    if (weekStart !== weeksInfo.thisMonday) {
-        return c.json({ error: "Only this week's tasks can be marked as done" }, 409);
+    const lastMonday = addWeeks(weeksInfo.thisMonday, -1);
+    if (weekStart !== weeksInfo.thisMonday && weekStart !== lastMonday) {
+        return c.json({ error: "Only this week's and last week's tasks can be changed" }, 409);
     }
 
     await c.env.DB.prepare(
@@ -62,7 +64,7 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
         .bind(user.id, houseId, weekStart, taskId)
         .run();
 
-    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart);
+    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart, weeksInfo.timezone);
     const assignment = assignments.find((a) => a.taskId === taskId);
     if (!assignment) {
         return c.json({ error: "This task isn't part of this week" }, 404);
@@ -90,8 +92,9 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
         return c.json({ error: "House not found" }, 404);
     }
 
-    if (weekStart !== weeksInfo.thisMonday) {
-        return c.json({ error: "Only this week's tasks can be changed" }, 409);
+    const lastMonday = addWeeks(weeksInfo.thisMonday, -1);
+    if (weekStart !== weeksInfo.thisMonday && weekStart !== lastMonday) {
+        return c.json({ error: "Only this week's and last week's tasks can be changed" }, 409);
     }
 
     // Only the person who ticked it can untick it
@@ -103,7 +106,7 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
         .bind(houseId, weekStart, taskId, user.id)
         .run();
 
-    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart);
+    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart, weeksInfo.timezone);
     const assignment = assignments.find((a) => a.taskId === taskId);
     if (!assignment) {
         return c.json({ error: "This task isn't part of this week" }, 404);

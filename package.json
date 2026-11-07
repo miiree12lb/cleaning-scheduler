@@ -7,7 +7,7 @@
     "dev": "npm --prefix web run dev",
     "dev:login": "wrangler d1 execute cleaning-db --local --command \"INSERT OR REPLACE INTO sessions (id, user_id, expires_at) VALUES ('test-session', 1, datetime('now', '+1 day'))\"",
     "build": "npm --prefix web run build",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm --prefix web run build && cd web && wrangler deploy --config dist/cleaning_scheduler/wrangler.json",
     "typecheck": "tsc -p .",
     "db:migrate:local": "wrangler d1 migrations apply cleaning-db --local",
     "format": "prettier . --write",

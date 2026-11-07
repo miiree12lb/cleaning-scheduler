@@ -100,6 +100,7 @@ auth.get("/callback", async (c) => {
 
     // The person cancelled at Google, or something went wrong there
     if (c.req.query("error")) {
+        console.error("Google returned an error:", c.req.query("error"));
         return c.redirect("/login?error=cancelled");
     }
 
@@ -107,6 +108,12 @@ auth.get("/callback", async (c) => {
     const state = c.req.query("state");
     const code = c.req.query("code");
     if (!code || !state || !expectedState || state !== expectedState) {
+        console.error("State check failed:", {
+            hasCode: !!code,
+            hasState: !!state,
+            hasCookie: !!expectedState,
+            matches: state === expectedState,
+        });
         return c.redirect("/login?error=failed");
     }
 
@@ -132,11 +139,12 @@ auth.get("/callback", async (c) => {
         )
             .bind(profile.googleId, profile.email, profile.name)
             .first<{ id: number }>();
-    } catch {
-        // e.g. another account already uses this email
+    } catch (err) {
+        console.error("Saving the user failed:", err);
         return c.redirect("/login?error=email_in_use");
     }
     if (!user) {
+        console.error("Saving the user returned no row");
         return c.redirect("/login?error=failed");
     }
 

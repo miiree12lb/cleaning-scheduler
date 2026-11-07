@@ -31,6 +31,7 @@ export type Member = {
 export type WeekPlan = {
     weekStart: string;
     status: "past" | "current" | "preview";
+    canMark: boolean;
     currentWeekStart: string;
     firstWeekStart: string;
     assignments: {
@@ -41,6 +42,7 @@ export type WeekPlan = {
         doneAt: string | null;
         doneById: number | null;
         doneByName: string | null;
+        late: boolean;
     }[];
 };
 

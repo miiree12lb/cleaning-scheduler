@@ -150,6 +150,7 @@ function TaskItem({ assignment: a, variant, myId, onToggle, busy }: TaskItemProp
             {doneBySomeoneElse && (
                 <span className="done-by">Done by {a.doneByName ?? "a former member"}</span>
             )}
+            {a.late && <span className="late-badge">Late</span>}
         </>
     );
 
