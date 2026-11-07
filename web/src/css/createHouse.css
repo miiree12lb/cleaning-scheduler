@@ -128,3 +128,21 @@
 .back-link:hover {
     color: var(--text);
 }
+
+.home-account {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    margin: 0 auto 16px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.home-account:hover {
+    border-color: var(--accent);
+}
