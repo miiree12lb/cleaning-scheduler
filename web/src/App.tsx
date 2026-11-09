@@ -15,6 +15,7 @@ import Settings from "./pages/house/Settings";
 import JoinHouse from "./pages/JoinHouse";
 import Account from "./pages/Account";
 import Tasks from "./pages/house/Tasks";
+import Privacy from "./pages/Privacy";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -40,6 +41,7 @@ export default function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/privacy" element={<Privacy />} />
 
                 <Route element={<RequireAuth />}>
                     <Route path="/" element={<Home />} />

@@ -1,4 +1,5 @@
 import { Navigate, useSearchParams } from "react-router";
+import { Link } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import PasswordForm from "./login/PasswordForm";
 import "../css/login.css";
@@ -54,6 +55,10 @@ export default function Login() {
 
                     <PasswordForm returnTo={returnTo ?? "/"} />
             </div>
+
+            <p className="login-privacy">
+                By continuing, your name and email are stored to run the app. <Link to="/privacy">Privacy</Link>
+            </p>
         </div>
     );
 }

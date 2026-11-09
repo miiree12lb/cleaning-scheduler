@@ -136,3 +136,14 @@
 .password-form {
     text-align: left;
 }
+
+.login-privacy {
+    margin: 20px 0 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.login-privacy a {
+    color: var(--accent);
+}
