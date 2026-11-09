@@ -16,6 +16,7 @@ import JoinHouse from "./pages/JoinHouse";
 import Account from "./pages/Account";
 import Tasks from "./pages/house/Tasks";
 import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -42,6 +43,7 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
 
                 <Route element={<RequireAuth />}>
                     <Route path="/" element={<Home />} />

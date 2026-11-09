@@ -57,7 +57,8 @@ export default function Login() {
             </div>
 
             <p className="login-privacy">
-                By continuing, your name and email are stored to run the app. <Link to="/privacy">Privacy</Link>
+                By continuing, you agree to the <Link to="/terms">Terms</Link>. Your name and email are stored to run the app:
+                see <Link to="/privacy">Privacy</Link>.
             </p>
         </div>
     );
