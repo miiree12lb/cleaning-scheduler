@@ -72,7 +72,7 @@ export default function WeekView({ plan, myId, onToggle, busyTaskId = null }: Pr
                 )}
 
                 {plan.status === "current" && mine.length > 0 && mineDone === mine.length && (
-                    <p className="week-all-done">All done for this week. Thank you! ✨</p>
+                    <p className="week-all-done">All done for this week. Thank you! 🎉</p>
                 )}
             </section>
 
