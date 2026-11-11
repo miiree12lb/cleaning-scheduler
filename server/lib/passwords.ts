@@ -22,10 +22,18 @@ function fromHex(hex: string): Uint8Array {
     return bytes;
 }
 
-async function derive(password: string, salt: Uint8Array, iterations: number): Promise<string> {
-    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, [
-        "deriveBits",
-    ]);
+async function derive(
+    password: string,
+    salt: Uint8Array,
+    iterations: number,
+): Promise<string> {
+    const key = await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"],
+    );
     const bits = await crypto.subtle.deriveBits(
         { name: "PBKDF2", hash: "SHA-256", salt, iterations },
         key,
@@ -56,7 +64,14 @@ export async function hashPassword(password: string): Promise<StoredPassword> {
 }
 
 // Check a password against what's stored, using the iterations it was saved with
-export async function verifyPassword(password: string, stored: StoredPassword): Promise<boolean> {
-    const hash = await derive(password, fromHex(stored.salt), stored.iterations);
+export async function verifyPassword(
+    password: string,
+    stored: StoredPassword,
+): Promise<boolean> {
+    const hash = await derive(
+        password,
+        fromHex(stored.salt),
+        stored.iterations,
+    );
     return sameString(hash, stored.hash);
 }

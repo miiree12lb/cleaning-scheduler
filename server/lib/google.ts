@@ -7,7 +7,10 @@ export type GoogleProfile = {
 // Read the part of a JWT (like Google's ID token) that holds the data
 function decodeJwtPayload(token: string): Record<string, unknown> {
     const part = token.split(".")[1] ?? "";
-    const base64 = part.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(part.length / 4) * 4, "=");
+    const base64 = part
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
+        .padEnd(Math.ceil(part.length / 4) * 4, "=");
     const bytes = Uint8Array.from(atob(base64), (ch) => ch.charCodeAt(0));
     return JSON.parse(new TextDecoder().decode(bytes));
 }
@@ -46,19 +49,38 @@ export async function exchangeCode(
     const claims = decodeJwtPayload(tokens.id_token);
 
     // Check the token is really for this app, from Google, still valid, with a verified email
-    const issuerOk = claims.iss === "https://accounts.google.com" || claims.iss === "accounts.google.com";
+    const issuerOk =
+        claims.iss === "https://accounts.google.com" ||
+        claims.iss === "accounts.google.com";
     const audienceOk = claims.aud === clientId;
-    const notExpired = typeof claims.exp === "number" && claims.exp * 1000 > Date.now();
-    const emailOk = typeof claims.email === "string" && claims.email_verified === true;
+    const notExpired =
+        typeof claims.exp === "number" && claims.exp * 1000 > Date.now();
+    const emailOk =
+        typeof claims.email === "string" && claims.email_verified === true;
 
-    if (!issuerOk || !audienceOk || !notExpired || !emailOk || typeof claims.sub !== "string") {
-        console.error("ID token rejected:", { issuerOk, audienceOk, notExpired, emailOk, hasSub: typeof claims.sub === "string" });
+    if (
+        !issuerOk ||
+        !audienceOk ||
+        !notExpired ||
+        !emailOk ||
+        typeof claims.sub !== "string"
+    ) {
+        console.error("ID token rejected:", {
+            issuerOk,
+            audienceOk,
+            notExpired,
+            emailOk,
+            hasSub: typeof claims.sub === "string",
+        });
         return null;
     }
 
     return {
         googleId: claims.sub,
         email: claims.email as string,
-        name: typeof claims.name === "string" && claims.name.trim() ? claims.name : (claims.email as string),
+        name:
+            typeof claims.name === "string" && claims.name.trim()
+                ? claims.name
+                : (claims.email as string),
     };
 }

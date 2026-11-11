@@ -48,7 +48,9 @@ export function useWeek(houseId: number, week: string) {
                 { method: assignment.doneAt ? "DELETE" : "PUT" },
             );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not update the task."));
+                setActionError(
+                    await readError(res, "Could not update the task."),
+                );
                 return;
             }
             const updated: Assignment = await res.json();
@@ -57,7 +59,9 @@ export function useWeek(houseId: number, week: string) {
                     ? prev
                     : {
                           ...prev,
-                          assignments: prev.assignments.map((a) => (a.taskId === updated.taskId ? updated : a)),
+                          assignments: prev.assignments.map((a) =>
+                              a.taskId === updated.taskId ? updated : a,
+                          ),
                       },
             );
         } catch {

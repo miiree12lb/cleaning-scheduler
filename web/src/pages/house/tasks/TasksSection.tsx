@@ -44,18 +44,25 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         setBusyId(task.id);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}`, { method: "DELETE" });
+            const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}`, {
+                method: "DELETE",
+            });
             if (!res.ok) {
-                setActionError(await readError(res, "Could not remove the task."));
+                setActionError(
+                    await readError(res, "Could not remove the task."),
+                );
                 return;
             }
-            const { result }: { result: "deleted" | "archived" } = await res.json();
+            const { result }: { result: "deleted" | "archived" } =
+                await res.json();
             setTasks((prev) =>
                 prev === null
                     ? prev
                     : result === "deleted"
                       ? prev.filter((t) => t.id !== task.id)
-                      : prev.map((t) => (t.id === task.id ? { ...t, active: 0 } : t)),
+                      : prev.map((t) =>
+                            t.id === task.id ? { ...t, active: 0 } : t,
+                        ),
             );
         } catch {
             setActionError("Could not reach the server.");
@@ -68,15 +75,24 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         setBusyId(task.id);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}/restore`, {
-                method: "POST",
-            });
+            const res = await fetch(
+                `/api/houses/${houseId}/tasks/${task.id}/restore`,
+                {
+                    method: "POST",
+                },
+            );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not restore the task."));
+                setActionError(
+                    await readError(res, "Could not restore the task."),
+                );
                 return;
             }
             const restored: Task = await res.json();
-            setTasks((prev) => (prev === null ? prev : prev.map((t) => (t.id === task.id ? restored : t))));
+            setTasks((prev) =>
+                prev === null
+                    ? prev
+                    : prev.map((t) => (t.id === task.id ? restored : t)),
+            );
         } catch {
             setActionError("Could not reach the server.");
         } finally {
@@ -109,7 +125,11 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                     houseId={houseId}
                     onCreated={(task) =>
                         setTasks((prev) =>
-                            prev === null ? prev : [...prev, task].sort((a, b) => a.name.localeCompare(b.name)),
+                            prev === null
+                                ? prev
+                                : [...prev, task].sort((a, b) =>
+                                      a.name.localeCompare(b.name),
+                                  ),
                         )
                     }
                     onArchivedExists={(taskId) => {
@@ -140,8 +160,16 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                                         prev === null
                                             ? prev
                                             : prev
-                                                .map((t) => (t.id === saved.id ? saved : t))
-                                                .sort((a, b) => a.name.localeCompare(b.name)),
+                                                  .map((t) =>
+                                                      t.id === saved.id
+                                                          ? saved
+                                                          : t,
+                                                  )
+                                                  .sort((a, b) =>
+                                                      a.name.localeCompare(
+                                                          b.name,
+                                                      ),
+                                                  ),
                                     );
                                     setEditingId(null);
                                 }}
@@ -153,20 +181,30 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                                     <>
                                         <button
                                             className="icon-button"
-                                            onClick={() => setEditingId(task.id)}
+                                            onClick={() =>
+                                                setEditingId(task.id)
+                                            }
                                             aria-label={`Edit ${task.name}`}
                                             title="Edit"
                                         >
-                                            <Pencil size={16} aria-hidden="true" />
+                                            <Pencil
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                         <button
                                             className="icon-button danger"
-                                            onClick={() => setPendingRemoval(task)}
+                                            onClick={() =>
+                                                setPendingRemoval(task)
+                                            }
                                             disabled={busyId === task.id}
                                             aria-label={`Remove ${task.name}`}
                                             title="Remove"
                                         >
-                                            <Archive size={16} aria-hidden="true" />
+                                            <Archive
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                     </>
                                 )}
@@ -187,7 +225,10 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                                     onClick={() => restoreTask(task)}
                                     disabled={busyId === task.id}
                                 >
-                                    <ArchiveRestore size={16} aria-hidden="true" />
+                                    <ArchiveRestore
+                                        size={16}
+                                        aria-hidden="true"
+                                    />
                                     <span>Restore</span>
                                 </button>
                             </TaskRow>
@@ -219,7 +260,6 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
                     setPendingRestore(null);
                 }}
             />
-
         </section>
     );
 }
@@ -235,7 +275,9 @@ function TaskRow({ task, muted = false, children }: TaskRowProps) {
         <li className={muted ? "task-row muted" : "task-row"}>
             <div className="task-text">
                 <span className="task-name">{task.name}</span>
-                {task.description && <span className="task-description">{task.description}</span>}
+                {task.description && (
+                    <span className="task-description">{task.description}</span>
+                )}
             </div>
             {children && <div className="task-actions">{children}</div>}
         </li>

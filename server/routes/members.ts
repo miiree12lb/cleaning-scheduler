@@ -33,7 +33,9 @@ members.delete("/me", async (c) => {
 
     if (result === "last_admin") {
         return c.json(
-            { error: "You're the only admin. Make someone else admin first, or delete the house." },
+            {
+                error: "You're the only admin. Make someone else admin first, or delete the house.",
+            },
             409,
         );
     }
@@ -51,7 +53,10 @@ members.delete("/:userId", requireAdmin, async (c) => {
     const result = await removeMember(c.env.DB, houseId, userId);
 
     if (result === "last_admin") {
-        return c.json({ error: "There must be at least one admin in the house." }, 409);
+        return c.json(
+            { error: "There must be at least one admin in the house." },
+            409,
+        );
     }
     if (result === "not_found") {
         return c.json({ error: "Member not found" }, 404);
@@ -96,7 +101,9 @@ members.patch("/:userId/role", requireAdmin, async (c) => {
         return c.json(row);
     }
 
-    const member = await c.env.DB.prepare("SELECT 1 FROM house_members WHERE house_id = ? AND user_id = ?")
+    const member = await c.env.DB.prepare(
+        "SELECT 1 FROM house_members WHERE house_id = ? AND user_id = ?",
+    )
         .bind(houseId, userId)
         .first();
 
@@ -104,7 +111,12 @@ members.patch("/:userId/role", requireAdmin, async (c) => {
         return c.json({ error: "Member not found" }, 404);
     }
 
-    return c.json({ error: "There must be at least one admin. Make someone else admin first." }, 409);
+    return c.json(
+        {
+            error: "There must be at least one admin. Make someone else admin first.",
+        },
+        409,
+    );
 });
 
 export default members;

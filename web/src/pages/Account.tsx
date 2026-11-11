@@ -24,9 +24,13 @@ export default function Account() {
         try {
             const res = await fetch("/api/auth/me", { method: "DELETE" });
             if (res.status === 409) {
-                const body: { houses?: BlockingHouse[] } = await res.json().catch(() => ({}));
+                const body: { houses?: BlockingHouse[] } = await res
+                    .json()
+                    .catch(() => ({}));
                 setBlocking(body.houses ?? []);
-                setError("You're the only admin of these houses. Make someone else admin, or delete the house, first:");
+                setError(
+                    "You're the only admin of these houses. Make someone else admin, or delete the house, first:",
+                );
                 return;
             }
             if (!res.ok) {
@@ -44,7 +48,11 @@ export default function Account() {
 
     return (
         <div className="account-page">
-            <Link to="/" className="back-link account-back">
+            <Link
+                to="/"
+                state={{ choose: true }}
+                className="back-link account-back"
+            >
                 <ArrowLeft size={16} aria-hidden="true" /> Back to my houses
             </Link>
 
@@ -63,9 +71,16 @@ export default function Account() {
                 <header className="section-header">
                     <h2>Log out</h2>
                 </header>
-                <p className="section-hint">Log out on this device. Your account and houses stay as they are.</p>
+                <p className="section-hint">
+                    Log out on this device. Your account and houses stay as they
+                    are.
+                </p>
 
-                <button type="button" className="secondary-button" onClick={logout}>
+                <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={logout}
+                >
                     <LogOut size={16} aria-hidden="true" />
                     Log out
                 </button>
@@ -76,8 +91,9 @@ export default function Account() {
                     <h2>Delete account</h2>
                 </header>
                 <p className="section-hint">
-                    You'll leave all your houses, and your unfinished tasks this week go to your housemates.
-                    Tasks you did in the past stay in each house's history as "Former member". This can't be
+                    You'll leave all your houses, and your unfinished tasks this
+                    week go to your housemates. Tasks you did in the past stay
+                    in each house's history as "Former member". This can't be
                     undone.
                 </p>
 
@@ -88,7 +104,9 @@ export default function Account() {
                             <ul>
                                 {blocking.map((h) => (
                                     <li key={h.id}>
-                                        <Link to={`/houses/${h.id}/settings`}>{h.name}</Link>
+                                        <Link to={`/houses/${h.id}/settings`}>
+                                            {h.name}
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>
@@ -106,6 +124,11 @@ export default function Account() {
                     {deleting ? "Deleting…" : "Delete my account"}
                 </button>
             </section>
+
+            <p className="section-hint">
+                <Link to="/privacy">Privacy</Link> ·{" "}
+                <Link to="/terms">Terms</Link>
+            </p>
 
             <ConfirmDialog
                 open={confirming}

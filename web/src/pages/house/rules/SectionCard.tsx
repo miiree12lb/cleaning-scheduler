@@ -42,7 +42,10 @@ export default function SectionCard({
     const iUseIt = me !== null && section.users.some((u) => u.id === me.id);
     const bodyId = `section-body-${section.id}`;
 
-    async function patchSection(changes: { name?: string; optIn?: boolean }): Promise<boolean> {
+    async function patchSection(changes: {
+        name?: string;
+        optIn?: boolean;
+    }): Promise<boolean> {
         setSaving(true);
         setError(null);
         try {
@@ -101,7 +104,9 @@ export default function SectionCard({
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`${base}/me`, { method: value ? "PUT" : "DELETE" });
+            const res = await fetch(`${base}/me`, {
+                method: value ? "PUT" : "DELETE",
+            });
             if (!res.ok) {
                 setError(await readError(res, "Could not save your answer."));
                 return;
@@ -123,7 +128,11 @@ export default function SectionCard({
         <section className="settings-section rule-section">
             <div className="rule-section-header">
                 {renaming ? (
-                    <form className="section-rename" onSubmit={handleRename} onKeyDown={handleRenameKeyDown}>
+                    <form
+                        className="section-rename"
+                        onSubmit={handleRename}
+                        onKeyDown={handleRenameKeyDown}
+                    >
                         <input
                             value={nameDraft}
                             onChange={(e) => setNameDraft(e.target.value)}
@@ -131,7 +140,11 @@ export default function SectionCard({
                             autoFocus
                             aria-label="Section name"
                         />
-                        <button type="submit" className="primary-button" disabled={saving}>
+                        <button
+                            type="submit"
+                            className="primary-button"
+                            disabled={saving}
+                        >
                             Save
                         </button>
                         <button
@@ -159,10 +172,15 @@ export default function SectionCard({
                             className={expanded ? "chevron open" : "chevron"}
                         />
                         <h2>{section.name}</h2>
-                        <span className="section-count">{section.rules.length}</span>
+                        <span className="section-count">
+                            {section.rules.length}
+                        </span>
                         {section.optIn && (
                             <span className="picker-badge">
-                                {section.users.length} {section.users.length === 1 ? "uses it" : "use it"}
+                                {section.users.length}{" "}
+                                {section.users.length === 1
+                                    ? "uses it"
+                                    : "use it"}
                             </span>
                         )}
                     </button>
@@ -235,16 +253,26 @@ export default function SectionCard({
                                 disabled={saving || me === null}
                             />
                             {section.users.length === 0 ? (
-                                <p className="rules-empty">Nobody has said they use this yet.</p>
+                                <p className="rules-empty">
+                                    Nobody has said they use this yet.
+                                </p>
                             ) : (
                                 <ul className="who-uses">
                                     {section.users.map((u) => (
                                         <li key={u.id}>
-                                            <span className="picker-avatar" aria-hidden="true">
+                                            <span
+                                                className="picker-avatar"
+                                                aria-hidden="true"
+                                            >
                                                 {u.name.charAt(0).toUpperCase()}
                                             </span>
                                             {u.name}
-                                            {me?.id === u.id && <span className="member-you"> (you)</span>}
+                                            {me?.id === u.id && (
+                                                <span className="member-you">
+                                                    {" "}
+                                                    (you)
+                                                </span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

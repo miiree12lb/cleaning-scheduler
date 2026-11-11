@@ -5,6 +5,7 @@ import { requireAdmin, requireMember } from "../lib/membership";
 import type { Task } from "../../shared/types";
 import { parseDescription, parseName, parseId } from "../lib/validate";
 import { assignTaskThisWeek, removeTaskThisWeek } from "../lib/schedule";
+import { LIMITS, countOf } from "../lib/limits";
 
 const tasks = new Hono<AppEnv>();
 tasks.use(requireAuth, requireMember);
@@ -66,9 +67,29 @@ tasks.post("/", requireAdmin, async (c) => {
 
     if (existing !== null) {
         if (existing.active === 1) {
-            return c.json({ error: "A task with this name already exists", taskId: existing.id }, 409);
+            return c.json(
+                {
+                    error: "A task with this name already exists",
+                    taskId: existing.id,
+                },
+                409,
+            );
         }
         return c.json({ error: "archived_exists", taskId: existing.id }, 409);
+    }
+
+    const active = await countOf(
+        c.env.DB,
+        "SELECT COUNT(*) AS count FROM tasks WHERE house_id = ? AND active = 1",
+        houseId,
+    );
+    if (active >= LIMITS.activeTasksPerHouse) {
+        return c.json(
+            {
+                error: `A house can have at most ${LIMITS.activeTasksPerHouse} active tasks. Archive one first.`,
+            },
+            409,
+        );
     }
 
     const task = await c.env.DB.prepare(
@@ -94,22 +115,30 @@ tasks.delete("/:taskId", requireAdmin, async (c) => {
     }
 
     const { houseId } = c.get("membership");
-    const existing = await c.env.DB.prepare("SELECT id FROM tasks WHERE id = ? AND house_id = ?")
+    const existing = await c.env.DB.prepare(
+        "SELECT id FROM tasks WHERE id = ? AND house_id = ?",
+    )
         .bind(taskId, houseId)
         .first<{ id: number }>();
     if (!existing) {
         return c.json({ error: "Task not found" }, 404);
     }
 
-    const history = await c.env.DB.prepare("SELECT 1 FROM assignments WHERE task_id = ? LIMIT 1")
+    const history = await c.env.DB.prepare(
+        "SELECT 1 FROM assignments WHERE task_id = ? LIMIT 1",
+    )
         .bind(taskId)
         .first();
     if (!history) {
-        await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(taskId).run();
+        await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?")
+            .bind(taskId)
+            .run();
         return c.json({ result: "deleted" });
     }
 
-    await c.env.DB.prepare("UPDATE tasks SET active = 0 WHERE id = ?").bind(taskId).run();
+    await c.env.DB.prepare("UPDATE tasks SET active = 0 WHERE id = ?")
+        .bind(taskId)
+        .run();
     await removeTaskThisWeek(c.env.DB, houseId, taskId);
     return c.json({ result: "archived" });
 });
@@ -122,18 +151,47 @@ tasks.post("/:taskId/restore", requireAdmin, async (c) => {
     }
 
     const { houseId } = c.get("membership");
-    const task = await c.env.DB.prepare(
-        "UPDATE tasks SET active = 1 WHERE id = ? AND house_id = ? RETURNING id, name, description, active",
+
+    const current = await c.env.DB.prepare(
+        "SELECT id, name, description, active FROM tasks WHERE id = ? AND house_id = ?",
     )
         .bind(taskId, houseId)
         .first<Task>();
-    if (!task) {
+    if (!current) {
         return c.json({ error: "Task not found" }, 404);
     }
+    if (current.active === 1) {
+        return c.json(current); // already active: nothing to do
+    }
 
-    await assignTaskThisWeek(c.env.DB, houseId, task.id);
+    const active = await countOf(
+        c.env.DB,
+        "SELECT COUNT(*) AS count FROM tasks WHERE house_id = ? AND active = 1",
+        houseId,
+    );
+    if (active >= LIMITS.activeTasksPerHouse) {
+        return c.json(
+            {
+                error: `A house can have at most ${LIMITS.activeTasksPerHouse} active tasks. Archive one first.`,
+            },
+            409,
+        );
+    }
 
-    return c.json(task);
+    // AND active = 0: if another request restored it in the meantime, this does nothing
+    const task = await c.env.DB.prepare(
+        `UPDATE tasks SET active = 1
+         WHERE id = ? AND house_id = ? AND active = 0
+         RETURNING id, name, description, active`,
+    )
+        .bind(taskId, houseId)
+        .first<Task>();
+
+    if (task) {
+        await assignTaskThisWeek(c.env.DB, houseId, task.id);
+        return c.json(task);
+    }
+    return c.json({ ...current, active: 1 });
 });
 
 // Edit a task's name and/or description

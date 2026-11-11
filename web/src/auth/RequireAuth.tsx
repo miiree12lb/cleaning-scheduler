@@ -11,7 +11,12 @@ export default function RequireAuth() {
 
     if (auth.status === "unauthenticated") {
         const from = location.pathname + location.search;
-        return <Navigate to={`/login?returnTo=${encodeURIComponent(from)}`} replace />;
+        return (
+            <Navigate
+                to={`/login?returnTo=${encodeURIComponent(from)}`}
+                replace
+            />
+        );
     }
 
     return <Outlet />;

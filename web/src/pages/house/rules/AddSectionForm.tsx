@@ -44,7 +44,11 @@ export default function AddSectionForm({ houseId, onCreated }: Props) {
     return (
         <form className="rule-form" onSubmit={handleSubmit} noValidate>
             <label htmlFor={inputId}>New section</label>
-            <Switch checked={optIn} onChange={setOptIn} label="Ask everyone whether they use this" />
+            <Switch
+                checked={optIn}
+                onChange={setOptIn}
+                label="Ask everyone whether they use this"
+            />
             <input
                 id={inputId}
                 className="section-name-input"
@@ -62,7 +66,11 @@ export default function AddSectionForm({ houseId, onCreated }: Props) {
                 ) : (
                     <span />
                 )}
-                <button type="submit" className="primary-button" disabled={saving}>
+                <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={saving}
+                >
                     <Plus size={16} aria-hidden="true" />
                     {saving ? "Adding…" : "Add section"}
                 </button>

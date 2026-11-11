@@ -47,8 +47,8 @@ export default function DangerZone({ houseId, houseName }: Props) {
             </header>
 
             <p className="section-hint">
-                Deleting the house removes it for everyone: members, tasks, the whole schedule history, and
-                the rules. This can't be undone.
+                Deleting the house removes it for everyone: members, tasks, the
+                whole schedule history, and the rules. This can't be undone.
             </p>
 
             <div className="danger-field">

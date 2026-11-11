@@ -1,13 +1,22 @@
 import type { WeekPlan } from "../../shared/types";
 import { planWeek } from "./rotation";
-import { mondayOf, dateIn, dateOfTimestamp, weeksBetween, addWeeks } from "./weeks";
+import {
+    mondayOf,
+    dateIn,
+    dateOfTimestamp,
+    weeksBetween,
+    addWeeks,
+} from "./weeks";
 
 export type RotationInput = {
-    members: { id: number; name: string }[];   // in rotation order
-    tasks: { id: number; name: string }[];     // active only, by id
+    members: { id: number; name: string }[]; // in rotation order
+    tasks: { id: number; name: string }[]; // active only, by id
 };
 
-export async function loadRotationInput(db: D1Database, houseId: number): Promise<RotationInput> {
+export async function loadRotationInput(
+    db: D1Database,
+    houseId: number,
+): Promise<RotationInput> {
     const { results: members } = await db
         .prepare(
             `SELECT users.id, users.name
@@ -20,7 +29,9 @@ export async function loadRotationInput(db: D1Database, houseId: number): Promis
         .all<{ id: number; name: string }>();
 
     const { results: tasks } = await db
-        .prepare("SELECT id, name FROM tasks WHERE house_id = ? AND active = 1 ORDER BY id")
+        .prepare(
+            "SELECT id, name FROM tasks WHERE house_id = ? AND active = 1 ORDER BY id",
+        )
         .bind(houseId)
         .all<{ id: number; name: string }>();
 
@@ -57,7 +68,9 @@ export async function readStoredWeek(
 
     return results.map((a) => ({
         ...a,
-        late: a.doneAt !== null && dateOfTimestamp(a.doneAt, timezone) >= nextMonday,
+        late:
+            a.doneAt !== null &&
+            dateOfTimestamp(a.doneAt, timezone) >= nextMonday,
     }));
 }
 
@@ -67,7 +80,12 @@ export async function ensureCurrentWeek(
     weekStart: string,
     week: number,
 ): Promise<void> {
-    const row = await db.prepare("SELECT 1 FROM assignments WHERE house_id = ? AND week_start = ? LIMIT 1").bind(houseId, weekStart).first();
+    const row = await db
+        .prepare(
+            "SELECT 1 FROM assignments WHERE house_id = ? AND week_start = ? LIMIT 1",
+        )
+        .bind(houseId, weekStart)
+        .first();
     if (row) {
         return;
     }
@@ -78,7 +96,7 @@ export async function ensureCurrentWeek(
         tasks.map((t) => t.id),
         week,
     );
-    
+
     if (planned.length === 0) {
         return;
     }
@@ -99,14 +117,20 @@ export async function ensureCurrentWeek(
 export async function loadHouseWeeks(
     db: D1Database,
     houseId: number,
-): Promise<{ thisMonday: string; firstMonday: string; timezone: string } | null> {
+): Promise<{
+    thisMonday: string;
+    firstMonday: string;
+    timezone: string;
+} | null> {
     const house = await db
         .prepare("SELECT timezone, created_at FROM houses WHERE id = ?")
         .bind(houseId)
         .first<{ timezone: string; created_at: string }>();
     if (!house) return null;
 
-    const firstMonday = mondayOf(dateOfTimestamp(house.created_at, house.timezone));
+    const firstMonday = mondayOf(
+        dateOfTimestamp(house.created_at, house.timezone),
+    );
     const thisMonday = mondayOf(dateIn(house.timezone));
 
     return { thisMonday, firstMonday, timezone: house.timezone };
@@ -122,7 +146,11 @@ export async function getWeekPlan(
 
     const week = weeksBetween(info.firstMonday, weekStart);
     const status: WeekPlan["status"] =
-        weekStart < info.thisMonday ? "past" : weekStart === info.thisMonday ? "current" : "preview";
+        weekStart < info.thisMonday
+            ? "past"
+            : weekStart === info.thisMonday
+              ? "current"
+              : "preview";
 
     const lastMonday = addWeeks(info.thisMonday, -1);
     const canMark = weekStart === info.thisMonday || weekStart === lastMonday;
@@ -146,39 +174,62 @@ export async function getWeekPlan(
             doneAt: null,
             doneById: null,
             doneByName: null,
-            late: false
+            late: false,
         }));
 
-        return { weekStart, status, canMark, currentWeekStart: info.thisMonday, firstWeekStart: info.firstMonday, assignments };
+        return {
+            weekStart,
+            status,
+            canMark,
+            currentWeekStart: info.thisMonday,
+            firstWeekStart: info.firstMonday,
+            assignments,
+        };
     }
 
     if (status === "current") {
         await ensureCurrentWeek(db, houseId, weekStart, week);
     }
 
-    const assignments = await readStoredWeek(db, houseId, weekStart, info.timezone);
-    return { weekStart, status, canMark, currentWeekStart: info.thisMonday, firstWeekStart: info.firstMonday, assignments };
+    const assignments = await readStoredWeek(
+        db,
+        houseId,
+        weekStart,
+        info.timezone,
+    );
+    return {
+        weekStart,
+        status,
+        canMark,
+        currentWeekStart: info.thisMonday,
+        firstWeekStart: info.firstMonday,
+        assignments,
+    };
 }
 
-export async function assignTaskThisWeek(db: D1Database, houseId: number, taskId: number): Promise<void> {
+export async function assignTaskThisWeek(
+    db: D1Database,
+    houseId: number,
+    taskId: number,
+): Promise<void> {
     const info = await loadHouseWeeks(db, houseId);
     if (!info) return;
 
     const thisMonday = info.thisMonday;
 
     const row = await db
-    .prepare(
-        `SELECT 1 FROM assignments
+        .prepare(
+            `SELECT 1 FROM assignments
          WHERE house_id = ? AND week_start = ?
          LIMIT 1`,
-    )
-    .bind(houseId, thisMonday)
-    .first();
+        )
+        .bind(houseId, thisMonday)
+        .first();
 
     if (!row) {
         return; // no week yet: it'll include the task when it's created
     }
-    
+
     const target = await db
         .prepare(
             `SELECT house_members.user_id AS userId
@@ -208,7 +259,11 @@ export async function assignTaskThisWeek(db: D1Database, houseId: number, taskId
         .run();
 }
 
-export async function removeTaskThisWeek(db: D1Database, houseId: number, taskId: number): Promise<void> {
+export async function removeTaskThisWeek(
+    db: D1Database,
+    houseId: number,
+    taskId: number,
+): Promise<void> {
     const info = await loadHouseWeeks(db, houseId);
     if (!info) return;
 
@@ -221,7 +276,11 @@ export async function removeTaskThisWeek(db: D1Database, houseId: number, taskId
         .run();
 }
 
-export async function reassignUnfinished(db: D1Database, houseId: number, leavingUserId: number): Promise<void> {
+export async function reassignUnfinished(
+    db: D1Database,
+    houseId: number,
+    leavingUserId: number,
+): Promise<void> {
     const info = await loadHouseWeeks(db, houseId);
     if (!info) return;
 
@@ -253,7 +312,13 @@ export async function reassignUnfinished(db: D1Database, houseId: number, leavin
                  )
                  WHERE house_id = ? AND week_start = ? AND task_id = ? AND done_at IS NULL`,
             )
-            .bind(info.thisMonday, houseId, houseId, info.thisMonday, row.taskId),
+            .bind(
+                info.thisMonday,
+                houseId,
+                houseId,
+                info.thisMonday,
+                row.taskId,
+            ),
     );
 
     await db.batch(statements);

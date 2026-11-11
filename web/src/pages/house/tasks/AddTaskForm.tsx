@@ -8,7 +8,11 @@ type Props = {
     onArchivedExists: (taskId: number) => void;
 };
 
-export default function AddTaskForm({ houseId, onCreated, onArchivedExists }: Props) {
+export default function AddTaskForm({
+    houseId,
+    onCreated,
+    onArchivedExists,
+}: Props) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +41,9 @@ export default function AddTaskForm({ houseId, onCreated, onArchivedExists }: Pr
                 return;
             }
 
-            const body: { error?: string; taskId?: number } = await res.json().catch(() => ({}));
+            const body: { error?: string; taskId?: number } = await res
+                .json()
+                .catch(() => ({}));
 
             if (body.error === "archived_exists" && body.taskId !== undefined) {
                 onArchivedExists(body.taskId);

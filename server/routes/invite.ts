@@ -9,7 +9,11 @@ invite.use(requireAuth, requireMember, requireAdmin);
 
 invite.get("/", async (c) => {
     const { houseId } = c.get("membership");
-    const row = await c.env.DB.prepare("SELECT invite_code FROM houses WHERE id = ?").bind(houseId).first<{ invite_code: string }>();
+    const row = await c.env.DB.prepare(
+        "SELECT invite_code FROM houses WHERE id = ?",
+    )
+        .bind(houseId)
+        .first<{ invite_code: string }>();
     if (!row) {
         return c.json({ error: "Invite code not found" }, 404);
     }

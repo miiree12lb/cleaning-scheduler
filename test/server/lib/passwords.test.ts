@@ -4,12 +4,16 @@ import { hashPassword, verifyPassword } from "../../../server/lib/passwords";
 describe("passwords", () => {
     it("accepts the right password", async () => {
         const stored = await hashPassword("correct horse battery");
-        expect(await verifyPassword("correct horse battery", stored)).toBe(true);
+        expect(await verifyPassword("correct horse battery", stored)).toBe(
+            true,
+        );
     });
 
     it("rejects a wrong password", async () => {
         const stored = await hashPassword("correct horse battery");
-        expect(await verifyPassword("correct horse batterY", stored)).toBe(false);
+        expect(await verifyPassword("correct horse batterY", stored)).toBe(
+            false,
+        );
     });
 
     it("gives the same password a different salt and hash each time", async () => {

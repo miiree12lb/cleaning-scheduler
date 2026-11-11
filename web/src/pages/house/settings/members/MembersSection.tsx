@@ -58,9 +58,13 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
     async function leaveHouse() {
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/members/me`, { method: "DELETE" });
+            const res = await fetch(`/api/houses/${houseId}/members/me`, {
+                method: "DELETE",
+            });
             if (!res.ok) {
-                setActionError(await readError(res, "Could not leave the house."));
+                setActionError(
+                    await readError(res, "Could not leave the house."),
+                );
                 return;
             }
             navigate("/", { replace: true });
@@ -73,17 +77,26 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
         setBusyId(member.id);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/members/${member.id}/role`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ role }),
-            });
+            const res = await fetch(
+                `/api/houses/${houseId}/members/${member.id}/role`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ role }),
+                },
+            );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not change the role."));
+                setActionError(
+                    await readError(res, "Could not change the role."),
+                );
                 return;
             }
             setMembers((prev) =>
-                prev === null ? prev : prev.map((m) => (m.id === member.id ? { ...m, role } : m)),
+                prev === null
+                    ? prev
+                    : prev.map((m) =>
+                          m.id === member.id ? { ...m, role } : m,
+                      ),
             );
             if (member.id === myId) {
                 await reloadHouse();
@@ -99,12 +112,19 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
         setBusyId(member.id);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/members/${member.id}`, { method: "DELETE" });
+            const res = await fetch(
+                `/api/houses/${houseId}/members/${member.id}`,
+                { method: "DELETE" },
+            );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not remove the member."));
+                setActionError(
+                    await readError(res, "Could not remove the member."),
+                );
                 return;
             }
-            setMembers((prev) => (prev === null ? prev : prev.filter((m) => m.id !== member.id)));
+            setMembers((prev) =>
+                prev === null ? prev : prev.filter((m) => m.id !== member.id),
+            );
         } catch {
             setActionError("Could not reach the server.");
         } finally {
@@ -151,12 +171,19 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                             <div className="task-text">
                                 <span className="task-name">
                                     {member.name}
-                                    {isMe && <span className="member-you"> (you)</span>}
+                                    {isMe && (
+                                        <span className="member-you">
+                                            {" "}
+                                            (you)
+                                        </span>
+                                    )}
                                 </span>
                             </div>
 
                             <div className="member-meta">
-                                {member.role === "admin" && <span className="picker-badge">Admin</span>}
+                                {member.role === "admin" && (
+                                    <span className="picker-badge">Admin</span>
+                                )}
 
                                 <div className="task-actions">
                                     {isAdmin && !isMe && (
@@ -164,20 +191,32 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                                             <button
                                                 className="icon-button"
                                                 onClick={() =>
-                                                    changeRole(member, member.role === "admin" ? "member" : "admin")
+                                                    changeRole(
+                                                        member,
+                                                        member.role === "admin"
+                                                            ? "member"
+                                                            : "admin",
+                                                    )
                                                 }
                                                 disabled={busy}
                                             >
-                                                {member.role === "admin" ? "Make member" : "Make admin"}
+                                                {member.role === "admin"
+                                                    ? "Make member"
+                                                    : "Make admin"}
                                             </button>
                                             <button
                                                 className="icon-button danger"
-                                                onClick={() => setPendingRemoval(member)}
+                                                onClick={() =>
+                                                    setPendingRemoval(member)
+                                                }
                                                 disabled={busy}
                                                 aria-label={`Remove ${member.name}`}
                                                 title="Remove"
                                             >
-                                                <UserMinus size={16} aria-hidden="true" />
+                                                <UserMinus
+                                                    size={16}
+                                                    aria-hidden="true"
+                                                />
                                             </button>
                                         </>
                                     )}
@@ -185,7 +224,9 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                                     {isMe && isAdmin && (
                                         <button
                                             className="icon-button"
-                                            onClick={() => setConfirmingStepDown(true)}
+                                            onClick={() =>
+                                                setConfirmingStepDown(true)
+                                            }
                                             disabled={busy}
                                         >
                                             Step down
@@ -193,8 +234,16 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
                                     )}
 
                                     {isMe && (
-                                        <button className="icon-button danger" onClick={() => setConfirmingLeave(true)}>
-                                            <LogOut size={16} aria-hidden="true" />
+                                        <button
+                                            className="icon-button danger"
+                                            onClick={() =>
+                                                setConfirmingLeave(true)
+                                            }
+                                        >
+                                            <LogOut
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                             <span>Leave</span>
                                         </button>
                                     )}

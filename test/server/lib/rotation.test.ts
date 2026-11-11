@@ -57,6 +57,8 @@ describe("planWeek", () => {
     });
 
     it("still gives valid people for a negative week", () => {
-        expect(planWeek([A, B, C], [1], -1)).toEqual([{ taskId: 1, userId: C }]);
+        expect(planWeek([A, B, C], [1], -1)).toEqual([
+            { taskId: 1, userId: C },
+        ]);
     });
 });

@@ -101,8 +101,6 @@
     border-color: color-mix(in srgb, var(--success) 35%, var(--border));
 }
 
-
-
 /* ---------- The check box ---------- */
 
 .check-box {
@@ -236,7 +234,11 @@
 .person-task.done .task-label {
     color: var(--text-muted);
     text-decoration: line-through;
-    text-decoration-color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+    text-decoration-color: color-mix(
+        in srgb,
+        var(--text-muted) 60%,
+        transparent
+    );
 }
 
 /* ---------- Calendar ---------- */

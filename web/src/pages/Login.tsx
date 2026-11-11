@@ -17,7 +17,10 @@ export default function Login() {
 
     // Only paths inside this app, never another site
     const requested = searchParams.get("returnTo") ?? "/";
-    const returnTo = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/";
+    const returnTo =
+        requested.startsWith("/") && !requested.startsWith("//")
+            ? requested
+            : "/";
 
     const error = searchParams.get("error");
 
@@ -49,16 +52,17 @@ export default function Login() {
                     Sign in with Google
                 </a>
 
-                   <div className="login-divider">
-                        <span>or</span>
-                    </div>
+                <div className="login-divider">
+                    <span>or</span>
+                </div>
 
-                    <PasswordForm returnTo={returnTo ?? "/"} />
+                <PasswordForm returnTo={returnTo ?? "/"} />
             </div>
 
             <p className="login-privacy">
-                By continuing, you agree to the <Link to="/terms">Terms</Link>. Your name and email are stored to run the app:
-                see <Link to="/privacy">Privacy</Link>.
+                By continuing, you agree to the <Link to="/terms">Terms</Link>.
+                Your name and email are stored to run the app: see{" "}
+                <Link to="/privacy">Privacy</Link>.
             </p>
         </div>
     );

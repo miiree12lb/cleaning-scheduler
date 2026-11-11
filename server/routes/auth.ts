@@ -7,7 +7,11 @@ import { randomHex } from "../lib/random";
 import { exchangeCode } from "../lib/google";
 import { removeMember } from "../lib/members";
 import { rateLimit } from "../lib/rateLimit";
-import { hashPassword, verifyPassword, type StoredPassword } from "../lib/passwords";
+import {
+    hashPassword,
+    verifyPassword,
+    type StoredPassword,
+} from "../lib/passwords";
 import { parseEmail, parseName, parsePassword } from "../lib/validate";
 import type { SessionUser } from "../../shared/types";
 
@@ -16,7 +20,9 @@ const auth = new Hono<AppEnv>();
 // ---------- Helpers ----------
 
 // Read the JSON body; null if it isn't valid JSON
-async function readBody(c: Context<AppEnv>): Promise<Record<string, unknown> | null> {
+async function readBody(
+    c: Context<AppEnv>,
+): Promise<Record<string, unknown> | null> {
     try {
         const body = await c.req.json();
         return body !== null && typeof body === "object" ? body : {};
@@ -27,7 +33,9 @@ async function readBody(c: Context<AppEnv>): Promise<Record<string, unknown> | n
 
 // Log someone in: clean up expired sessions, create a new one, and set the cookie
 async function startSession(c: Context<AppEnv>, userId: number) {
-    await c.env.DB.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
+    await c.env.DB.prepare(
+        "DELETE FROM sessions WHERE expires_at < datetime('now')",
+    ).run();
     const token = await createSession(c.env.DB, userId);
     setCookie(c, "session", token, {
         path: "/",
@@ -84,7 +92,9 @@ auth.delete("/me", requireAuth, async (c) => {
         }
     }
 
-    await c.env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id).run();
+    await c.env.DB.prepare("DELETE FROM users WHERE id = ?")
+        .bind(user.id)
+        .run();
 
     deleteCookie(c, "session", { path: "/" });
     return c.json({ ok: true });
@@ -134,11 +144,9 @@ auth.post("/register", rateLimit("AUTH_LIMITER"), async (c) => {
     let user: { id: number } | null;
     try {
         const [userRes] = await c.env.DB.batch([
-            c.env.DB.prepare("INSERT INTO users (email, name, google_id) VALUES (?, ?, ?) RETURNING id").bind(
-                email,
-                name,
-                `password:${randomHex(16)}`,
-            ),
+            c.env.DB.prepare(
+                "INSERT INTO users (email, name, google_id) VALUES (?, ?, ?) RETURNING id",
+            ).bind(email, name, `password:${randomHex(16)}`),
             c.env.DB.prepare(
                 `INSERT INTO password_logins (user_id, hash, salt, iterations)
                  VALUES ((SELECT id FROM users WHERE email = ?), ?, ?, ?)`,
@@ -148,7 +156,10 @@ auth.post("/register", rateLimit("AUTH_LIMITER"), async (c) => {
     } catch (err) {
         // Two sign-ups with the same email at the same moment: the UNIQUE index stops the second
         console.error("Registering failed:", err);
-        return c.json({ error: "This email already has an account. Log in instead." }, 409);
+        return c.json(
+            { error: "This email already has an account. Log in instead." },
+            409,
+        );
     }
     if (!user) return c.json({ error: "Could not create the account" }, 500);
 

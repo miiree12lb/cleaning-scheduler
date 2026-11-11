@@ -46,7 +46,9 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px 12px;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .field input::placeholder {
@@ -99,7 +101,9 @@
     background: var(--accent);
     color: var(--accent-contrast);
     cursor: pointer;
-    transition: filter 0.15s ease, opacity 0.15s ease;
+    transition:
+        filter 0.15s ease,
+        opacity 0.15s ease;
 }
 
 .primary-button:hover:not(:disabled) {

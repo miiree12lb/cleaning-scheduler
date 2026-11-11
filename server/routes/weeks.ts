@@ -3,7 +3,7 @@ import type { AppEnv } from "../types/types";
 import { requireAuth } from "../lib/auth";
 import { requireMember } from "../lib/membership";
 import { parseWeekStart, parseId } from "../lib/validate";
-import {readStoredWeek, loadHouseWeeks, getWeekPlan } from "../lib/schedule";
+import { readStoredWeek, loadHouseWeeks, getWeekPlan } from "../lib/schedule";
 import { addWeeks } from "../lib/weeks";
 
 const weeks = new Hono<AppEnv>();
@@ -21,7 +21,10 @@ weeks.get("/current", async (c) => {
 weeks.get("/:weekStart", async (c) => {
     const weekStart = parseWeekStart(c.req.param("weekStart"));
     if (weekStart === null) {
-        return c.json({ error: "weekStart must be a Monday, as YYYY-MM-DD" }, 400);
+        return c.json(
+            { error: "weekStart must be a Monday, as YYYY-MM-DD" },
+            400,
+        );
     }
 
     const { houseId } = c.get("membership");
@@ -38,7 +41,10 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
 
     const weekStart = parseWeekStart(c.req.param("weekStart"));
     if (weekStart === null) {
-        return c.json({ error: "weekStart must be a Monday, as YYYY-MM-DD" }, 400);
+        return c.json(
+            { error: "weekStart must be a Monday, as YYYY-MM-DD" },
+            400,
+        );
     }
 
     const taskId = parseId(c.req.param("taskId"));
@@ -53,7 +59,10 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
 
     const lastMonday = addWeeks(weeksInfo.thisMonday, -1);
     if (weekStart !== weeksInfo.thisMonday && weekStart !== lastMonday) {
-        return c.json({ error: "Only this week's and last week's tasks can be changed" }, 409);
+        return c.json(
+            { error: "Only this week's and last week's tasks can be changed" },
+            409,
+        );
     }
 
     await c.env.DB.prepare(
@@ -64,7 +73,12 @@ weeks.put("/:weekStart/tasks/:taskId/done", async (c) => {
         .bind(user.id, houseId, weekStart, taskId)
         .run();
 
-    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart, weeksInfo.timezone);
+    const assignments = await readStoredWeek(
+        c.env.DB,
+        houseId,
+        weekStart,
+        weeksInfo.timezone,
+    );
     const assignment = assignments.find((a) => a.taskId === taskId);
     if (!assignment) {
         return c.json({ error: "This task isn't part of this week" }, 404);
@@ -79,7 +93,10 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
 
     const weekStart = parseWeekStart(c.req.param("weekStart"));
     if (weekStart === null) {
-        return c.json({ error: "weekStart must be a Monday, as YYYY-MM-DD" }, 400);
+        return c.json(
+            { error: "weekStart must be a Monday, as YYYY-MM-DD" },
+            400,
+        );
     }
 
     const taskId = parseId(c.req.param("taskId"));
@@ -94,7 +111,10 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
 
     const lastMonday = addWeeks(weeksInfo.thisMonday, -1);
     if (weekStart !== weeksInfo.thisMonday && weekStart !== lastMonday) {
-        return c.json({ error: "Only this week's and last week's tasks can be changed" }, 409);
+        return c.json(
+            { error: "Only this week's and last week's tasks can be changed" },
+            409,
+        );
     }
 
     // Only the person who ticked it can untick it
@@ -106,7 +126,12 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
         .bind(houseId, weekStart, taskId, user.id)
         .run();
 
-    const assignments = await readStoredWeek(c.env.DB, houseId, weekStart, weeksInfo.timezone);
+    const assignments = await readStoredWeek(
+        c.env.DB,
+        houseId,
+        weekStart,
+        weeksInfo.timezone,
+    );
     const assignment = assignments.find((a) => a.taskId === taskId);
     if (!assignment) {
         return c.json({ error: "This task isn't part of this week" }, 404);
@@ -114,7 +139,12 @@ weeks.delete("/:weekStart/tasks/:taskId/done", async (c) => {
 
     // Nothing changed, but it's still done: someone else ticked it
     if (result.meta.changes === 0 && assignment.doneAt !== null) {
-        return c.json({ error: "Only the person who marked this task as done can undo it." }, 403);
+        return c.json(
+            {
+                error: "Only the person who marked this task as done can undo it.",
+            },
+            403,
+        );
     }
 
     return c.json(assignment);

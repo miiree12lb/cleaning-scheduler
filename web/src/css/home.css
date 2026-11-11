@@ -129,3 +129,57 @@
     border-color: var(--accent);
 }
 
+.picker-join {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.picker-join label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.picker-join-row {
+    display: flex;
+    gap: 8px;
+}
+
+.picker-join-row input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.picker-join-row input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.picker-join-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.picker-join-row input[aria-invalid="true"] {
+    border-color: var(--danger);
+}
+
+.picker-join-row .primary-button {
+    flex: none;
+}
+
+.picker-join-error {
+    margin: 0;
+    color: var(--danger);
+    font-size: 0.85rem;
+}

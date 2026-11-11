@@ -9,9 +9,17 @@ export default function Current() {
     const { house } = useHouse();
     const { auth } = useAuth();
     const myId = auth.status === "authenticated" ? auth.user.id : null;
-    const { plan, error, actionError, busyTaskId, toggleDone } = useWeek(house.id, "current");
+    const { plan, error, actionError, busyTaskId, toggleDone } = useWeek(
+        house.id,
+        "current",
+    );
 
-    if (error) return <div className="week-page"><p className="section-error">Couldn't load this week.</p></div>;
+    if (error)
+        return (
+            <div className="week-page">
+                <p className="section-error">Couldn't load this week.</p>
+            </div>
+        );
     if (plan === null) return null;
 
     return (
@@ -20,8 +28,17 @@ export default function Current() {
                 <h1>This week</h1>
                 <p className="week-dates">{formatWeekRange(plan.weekStart)}</p>
             </header>
-            {actionError && <p className="section-error" role="alert">{actionError}</p>}
-            <WeekView plan={plan} myId={myId} onToggle={toggleDone} busyTaskId={busyTaskId} />
+            {actionError && (
+                <p className="section-error" role="alert">
+                    {actionError}
+                </p>
+            )}
+            <WeekView
+                plan={plan}
+                myId={myId}
+                onToggle={toggleDone}
+                busyTaskId={busyTaskId}
+            />
         </div>
     );
 }

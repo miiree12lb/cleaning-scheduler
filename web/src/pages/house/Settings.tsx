@@ -10,8 +10,13 @@ export default function Settings() {
         <div className="settings">
             <h1>Settings</h1>
             {house.role === "admin" && <InviteSection houseId={house.id} />}
-            <MembersSection houseId={house.id} isAdmin={house.role === "admin"} />
-            {house.role === "admin" && <DangerZone houseId={house.id} houseName={house.name} />}
+            <MembersSection
+                houseId={house.id}
+                isAdmin={house.role === "admin"}
+            />
+            {house.role === "admin" && (
+                <DangerZone houseId={house.id} houseName={house.name} />
+            )}
         </div>
     );
 }

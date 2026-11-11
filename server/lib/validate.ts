@@ -41,7 +41,10 @@ export function parseDescription(input: unknown): ParseResult<string | null> {
 
     const trimmed = input.trim();
     if (trimmed.length > 200) {
-        return { ok: false, error: "Description cannot have more than 200 characters" };
+        return {
+            ok: false,
+            error: "Description cannot have more than 200 characters",
+        };
     }
 
     return { ok: true, value: trimmed === "" ? null : trimmed };
@@ -75,7 +78,10 @@ export function parseSectionName(input: unknown): ParseResult<string> {
         return { ok: false, error: "Section name cannot be empty" };
     }
     if (name.length > 40) {
-        return { ok: false, error: "Section name cannot have more than 40 characters" };
+        return {
+            ok: false,
+            error: "Section name cannot have more than 40 characters",
+        };
     }
 
     return { ok: true, value: name };
@@ -91,7 +97,10 @@ export function parseRuleText(input: unknown): ParseResult<string> {
         return { ok: false, error: "Rule cannot be empty" };
     }
     if (rule.length > 300) {
-        return { ok: false, error: "Rule cannot have more than 300 characters" };
+        return {
+            ok: false,
+            error: "Rule cannot have more than 300 characters",
+        };
     }
 
     return { ok: true, value: rule };
@@ -103,10 +112,16 @@ export function parsePassword(input: unknown): ParseResult<string> {
         return { ok: false, error: "Password must be text" };
     }
     if (input.length < 10) {
-        return { ok: false, error: "Password must have at least 10 characters" };
+        return {
+            ok: false,
+            error: "Password must have at least 10 characters",
+        };
     }
     if (input.length > 200) {
-        return { ok: false, error: "Password cannot have more than 200 characters" };
+        return {
+            ok: false,
+            error: "Password cannot have more than 200 characters",
+        };
     }
 
     return { ok: true, value: input };

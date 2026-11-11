@@ -22,14 +22,14 @@ export function mondayOf(date: string): string {
 }
 
 export function addWeeks(monday: string, weeks: number): string {
-    return addDays(monday, 7 * weeks)
+    return addDays(monday, 7 * weeks);
 }
 
 export function weeksBetween(fromMonday: string, toMonday: string): number {
     const from = new Date(fromMonday + "T00:00:00Z");
     const to = new Date(toMonday + "T00:00:00Z");
     const days = (to.getTime() - from.getTime()) / 86_400_000;
-    return Math.round(days/7);
+    return Math.round(days / 7);
 }
 
 export function dateOfTimestamp(timestamp: string, timeZone: string): string {

@@ -8,7 +8,12 @@ type Props = {
     onCancel: () => void;
 };
 
-export default function EditTaskRow({ houseId, task, onSaved, onCancel }: Props) {
+export default function EditTaskRow({
+    houseId,
+    task,
+    onSaved,
+    onCancel,
+}: Props) {
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description ?? "");
     const [error, setError] = useState<string | null>(null);
@@ -27,10 +32,10 @@ export default function EditTaskRow({ houseId, task, onSaved, onCancel }: Props)
             const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name, description })
-            })
+                body: JSON.stringify({ name, description }),
+            });
 
             if (!res.ok) {
                 const errorData = await res.json();
@@ -55,7 +60,12 @@ export default function EditTaskRow({ houseId, task, onSaved, onCancel }: Props)
 
     return (
         <li className="task-row editing">
-            <form className="edit-task" onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate>
+            <form
+                className="edit-task"
+                onSubmit={handleSubmit}
+                onKeyDown={handleKeyDown}
+                noValidate
+            >
                 <div className="add-task-fields">
                     <div className="add-task-field">
                         <label htmlFor={nameId}>Name</label>
@@ -73,7 +83,8 @@ export default function EditTaskRow({ houseId, task, onSaved, onCancel }: Props)
 
                     <div className="add-task-field">
                         <label htmlFor={descriptionId}>
-                            Description <span className="optional">(optional)</span>
+                            Description{" "}
+                            <span className="optional">(optional)</span>
                         </label>
                         <input
                             id={descriptionId}
@@ -86,10 +97,18 @@ export default function EditTaskRow({ houseId, task, onSaved, onCancel }: Props)
                 </div>
 
                 <div className="edit-task-actions">
-                    <button type="button" className="secondary-button" onClick={onCancel}>
+                    <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={onCancel}
+                    >
                         Cancel
                     </button>
-                    <button type="submit" className="primary-button" disabled={saving}>
+                    <button
+                        type="submit"
+                        className="primary-button"
+                        disabled={saving}
+                    >
                         {saving ? "Saving…" : "Save"}
                     </button>
                 </div>

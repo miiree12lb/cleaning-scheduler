@@ -22,7 +22,13 @@ type NavItem = {
 };
 
 const ITEMS: NavItem[] = [
-    { name: "Calendar", short: "Calendar", link: ".", icon: CalendarDays, end: true },
+    {
+        name: "Calendar",
+        short: "Calendar",
+        link: ".",
+        icon: CalendarDays,
+        end: true,
+    },
     { name: "Tasks", short: "Tasks", link: "tasks", icon: ListChecks },
     { name: "House Rules", short: "Rules", link: "rules", icon: ScrollText },
 ];
@@ -40,7 +46,12 @@ export default function Navbar({ theme, toggleTheme, houseName }: Props) {
     return (
         <>
             <header className="topbar">
-                <Link to="/" className="topbar-house" title="Switch house">
+                <Link
+                    to="/"
+                    className="topbar-house"
+                    title="Switch house"
+                    state={{ choose: true }}
+                >
                     {houseName}
                 </Link>
 
@@ -53,15 +64,29 @@ export default function Navbar({ theme, toggleTheme, houseName }: Props) {
                 </nav>
 
                 <div className="topbar-actions">
-                    <Link to="/account" className="topbar-user" title="Your account">
+                    <Link
+                        to="/account"
+                        className="topbar-user"
+                        title="Your account"
+                    >
                         <CircleUser size={18} aria-hidden="true" />
                         <span className="topbar-user-name">{userName}</span>
                     </Link>
-                    <NavLink to="settings" className="icon-link" aria-label="House settings" title="House settings">
+                    <NavLink
+                        to="settings"
+                        className="icon-link"
+                        aria-label="House settings"
+                        title="House settings"
+                    >
                         <SettingsIcon size={18} aria-hidden="true" />
                     </NavLink>
                     <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-                    <button className="logout-button" onClick={logout} aria-label="Log out" title="Log out">
+                    <button
+                        className="logout-button"
+                        onClick={logout}
+                        aria-label="Log out"
+                        title="Log out"
+                    >
                         <LogOut size={16} aria-hidden="true" />
                         <span className="logout-label">Log out</span>
                     </button>
@@ -72,7 +97,12 @@ export default function Navbar({ theme, toggleTheme, houseName }: Props) {
                 {ITEMS.map((item) => {
                     const Icon = item.icon;
                     return (
-                        <NavLink key={item.link} to={item.link} end={item.end} className="tab">
+                        <NavLink
+                            key={item.link}
+                            to={item.link}
+                            end={item.end}
+                            className="tab"
+                        >
                             <Icon size={22} aria-hidden="true" />
                             <span>{item.short}</span>
                         </NavLink>

@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    type ReactNode,
+} from "react";
 import type { SessionUser } from "../../../shared/types";
 import type { AuthState, AuthContextValue } from "../types/types";
 
@@ -33,14 +39,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function logout() {
         try {
             await fetch("/api/auth/logout", { method: "POST" });
-        }
-        catch {
+        } catch {
             // ignore: we log out locally either way
-        }
-        finally {
+        } finally {
             setAuth({ status: "unauthenticated" });
         }
     }
 
-    return <AuthContext.Provider value={{ auth, logout }}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={{ auth, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 }

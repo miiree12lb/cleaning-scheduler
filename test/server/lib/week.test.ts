@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addWeeks, mondayOf, dateIn, weeksBetween, dateOfTimestamp } from "../../../server/lib/weeks";
+import {
+    addWeeks,
+    mondayOf,
+    dateIn,
+    weeksBetween,
+    dateOfTimestamp,
+} from "../../../server/lib/weeks";
 
 describe("mondayOf", () => {
     it("keeps a Monday as it is", () => {
@@ -100,12 +106,18 @@ describe("dateIn", () => {
 
 describe("dateOfTimestamp", () => {
     it("reads the database time as UTC", () => {
-        expect(dateOfTimestamp("2026-11-05 21:20:14", "UTC")).toBe("2026-11-05");
+        expect(dateOfTimestamp("2026-11-05 21:20:14", "UTC")).toBe(
+            "2026-11-05",
+        );
     });
 
     it("converts to the house's timezone", () => {
         // 23:30 UTC on Sunday is 00:30 on Monday in Berlin
-        expect(dateOfTimestamp("2026-11-08 23:30:00", "Europe/Berlin")).toBe("2026-11-09");
-        expect(dateOfTimestamp("2026-11-08 23:30:00", "UTC")).toBe("2026-11-08");
+        expect(dateOfTimestamp("2026-11-08 23:30:00", "Europe/Berlin")).toBe(
+            "2026-11-09",
+        );
+        expect(dateOfTimestamp("2026-11-08 23:30:00", "UTC")).toBe(
+            "2026-11-08",
+        );
     });
 });

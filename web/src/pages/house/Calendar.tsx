@@ -23,13 +23,17 @@ export default function Calendar() {
     const [searchParams, setSearchParams] = useSearchParams();
     const week = searchParams.get("week") ?? "current";
 
-    const { plan, loading, error, actionError, busyTaskId, toggleDone } = useWeek(house.id, week);
+    const { plan, loading, error, actionError, busyTaskId, toggleDone } =
+        useWeek(house.id, week);
 
     if (error) {
         return (
             <div className="week-page">
                 <p className="section-error">Couldn't load this week.</p>
-                <button className="secondary-button" onClick={() => setSearchParams({})}>
+                <button
+                    className="secondary-button"
+                    onClick={() => setSearchParams({})}
+                >
                     Go to this week
                 </button>
             </div>
@@ -43,7 +47,9 @@ export default function Calendar() {
     const canGoForward = plan.weekStart < lastWeekStart;
 
     function goTo(weekStart: string) {
-        setSearchParams(weekStart === plan!.currentWeekStart ? {} : { week: weekStart });
+        setSearchParams(
+            weekStart === plan!.currentWeekStart ? {} : { week: weekStart },
+        );
     }
 
     return (
@@ -59,7 +65,9 @@ export default function Calendar() {
                 </button>
 
                 <div className="calendar-title">
-                    <span className={`week-status ${plan.status}`}>{STATUS_LABEL[plan.status]}</span>
+                    <span className={`week-status ${plan.status}`}>
+                        {STATUS_LABEL[plan.status]}
+                    </span>
                     <h1>{formatWeekRange(plan.weekStart)}</h1>
                 </div>
 
@@ -74,7 +82,10 @@ export default function Calendar() {
             </header>
 
             {plan.status !== "current" && (
-                <button className="calendar-today" onClick={() => goTo(plan.currentWeekStart)}>
+                <button
+                    className="calendar-today"
+                    onClick={() => goTo(plan.currentWeekStart)}
+                >
                     Back to this week
                 </button>
             )}
@@ -85,7 +96,9 @@ export default function Calendar() {
                 </p>
             )}
 
-            <div className={loading ? "calendar-body loading" : "calendar-body"}>
+            <div
+                className={loading ? "calendar-body loading" : "calendar-body"}
+            >
                 <WeekView
                     plan={plan}
                     myId={myId}

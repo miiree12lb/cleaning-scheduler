@@ -14,7 +14,13 @@ type Props = {
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
-export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange }: Props) {
+export default function RulesList({
+    houseId,
+    sectionId,
+    rules,
+    isAdmin,
+    onChange,
+}: Props) {
     const [actionError, setActionError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -46,7 +52,8 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ text }),
             });
-            if (!res.ok) return await readError(res, "Could not save the rule.");
+            if (!res.ok)
+                return await readError(res, "Could not save the rule.");
             const saved: Rule = await res.json();
             onChange(rules.map((r) => (r.id === saved.id ? saved : r)));
             setEditingId(null);
@@ -60,9 +67,13 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`${api}/rules/${rule.id}`, { method: "DELETE" });
+            const res = await fetch(`${api}/rules/${rule.id}`, {
+                method: "DELETE",
+            });
             if (!res.ok) {
-                setActionError(await readError(res, "Could not delete the rule."));
+                setActionError(
+                    await readError(res, "Could not delete the rule."),
+                );
                 return;
             }
             onChange(rules.filter((r) => r.id !== rule.id));
@@ -80,19 +91,27 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
         // Show the new order right away, then save it
         const previous = rules;
         const reordered = [...rules];
-        [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+        [reordered[index], reordered[target]] = [
+            reordered[target],
+            reordered[index],
+        ];
         onChange(reordered);
 
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`${api}/sections/${sectionId}/rules/order`, {
-                method: "PUT",
-                headers: JSON_HEADERS,
-                body: JSON.stringify({ ids: reordered.map((r) => r.id) }),
-            });
+            const res = await fetch(
+                `${api}/sections/${sectionId}/rules/order`,
+                {
+                    method: "PUT",
+                    headers: JSON_HEADERS,
+                    body: JSON.stringify({ ids: reordered.map((r) => r.id) }),
+                },
+            );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not save the new order."));
+                setActionError(
+                    await readError(res, "Could not save the new order."),
+                );
                 onChange(previous); // put the old order back
                 return;
             }
@@ -129,7 +148,10 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
                             />
                         ) : (
                             <li key={rule.id} className="rule-row">
-                                <span className="rule-number" aria-hidden="true">
+                                <span
+                                    className="rule-number"
+                                    aria-hidden="true"
+                                >
                                     {index + 1}
                                 </span>
                                 <p className="rule-text">{rule.text}</p>
@@ -143,33 +165,52 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
                                             aria-label={`Move rule ${index + 1} up`}
                                             title="Move up"
                                         >
-                                            <ArrowUp size={16} aria-hidden="true" />
+                                            <ArrowUp
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                         <button
                                             className="icon-button"
                                             onClick={() => move(index, 1)}
-                                            disabled={busy || index === rules.length - 1}
+                                            disabled={
+                                                busy ||
+                                                index === rules.length - 1
+                                            }
                                             aria-label={`Move rule ${index + 1} down`}
                                             title="Move down"
                                         >
-                                            <ArrowDown size={16} aria-hidden="true" />
+                                            <ArrowDown
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                         <button
                                             className="icon-button"
-                                            onClick={() => setEditingId(rule.id)}
+                                            onClick={() =>
+                                                setEditingId(rule.id)
+                                            }
                                             aria-label={`Edit rule ${index + 1}`}
                                             title="Edit"
                                         >
-                                            <Pencil size={16} aria-hidden="true" />
+                                            <Pencil
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                         <button
                                             className="icon-button danger"
-                                            onClick={() => setPendingDelete(rule)}
+                                            onClick={() =>
+                                                setPendingDelete(rule)
+                                            }
                                             disabled={busy}
                                             aria-label={`Delete rule ${index + 1}`}
                                             title="Delete"
                                         >
-                                            <Trash2 size={16} aria-hidden="true" />
+                                            <Trash2
+                                                size={16}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                     </div>
                                 )}
@@ -199,7 +240,11 @@ export default function RulesList({ houseId, sectionId, rules, isAdmin, onChange
 
 // ---------- Adding a rule ----------
 
-function AddRuleForm({ onAdd }: { onAdd: (text: string) => Promise<string | null> }) {
+function AddRuleForm({
+    onAdd,
+}: {
+    onAdd: (text: string) => Promise<string | null>;
+}) {
     const [text, setText] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
@@ -235,7 +280,11 @@ function AddRuleForm({ onAdd }: { onAdd: (text: string) => Promise<string | null
                 ) : (
                     <span className="field-count">{text.length}/300</span>
                 )}
-                <button type="submit" className="primary-button" disabled={saving}>
+                <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={saving}
+                >
                     <Plus size={16} aria-hidden="true" />
                     {saving ? "Adding…" : "Add rule"}
                 </button>
@@ -279,7 +328,12 @@ function EditRuleRow({ number, rule, onSave, onCancel }: EditRuleRowProps) {
             <span className="rule-number" aria-hidden="true">
                 {number}
             </span>
-            <form className="rule-edit" onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate>
+            <form
+                className="rule-edit"
+                onSubmit={handleSubmit}
+                onKeyDown={handleKeyDown}
+                noValidate
+            >
                 <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
@@ -295,10 +349,18 @@ function EditRuleRow({ number, rule, onSave, onCancel }: EditRuleRowProps) {
                     </p>
                 )}
                 <div className="edit-task-actions">
-                    <button type="button" className="secondary-button" onClick={onCancel}>
+                    <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={onCancel}
+                    >
                         Cancel
                     </button>
-                    <button type="submit" className="primary-button" disabled={saving}>
+                    <button
+                        type="submit"
+                        className="primary-button"
+                        disabled={saving}
+                    >
                         {saving ? "Saving…" : "Save"}
                     </button>
                 </div>

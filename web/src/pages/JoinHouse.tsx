@@ -17,7 +17,9 @@ export default function JoinHouse() {
 
         async function joinHouse() {
             try {
-                const res = await fetch(`/api/join/${code}`, { method: "POST" });
+                const res = await fetch(`/api/join/${code}`, {
+                    method: "POST",
+                });
 
                 if (res.ok) {
                     const house: HouseSummary = await res.json();
@@ -26,11 +28,14 @@ export default function JoinHouse() {
                 }
 
                 if (res.status === 400 || res.status === 404) {
-                    const body: { error?: string } = await res.json().catch(() => ({}));
+                    const body: { error?: string } = await res
+                        .json()
+                        .catch(() => ({}));
                     if (!cancelled) {
                         setState({
                             status: "invalid",
-                            message: body.error ?? "This invite link doesn't work.",
+                            message:
+                                body.error ?? "This invite link doesn't work.",
                         });
                     }
                     return;
@@ -66,7 +71,11 @@ export default function JoinHouse() {
     return (
         <div className="centered-page">
             <div className="card">
-                <h1>{state.status === "invalid" ? "Invite link not valid" : "Something went wrong"}</h1>
+                <h1>
+                    {state.status === "invalid"
+                        ? "Invite link not valid"
+                        : "Something went wrong"}
+                </h1>
                 <p className="card-subtitle">
                     {state.status === "invalid"
                         ? `${state.message} Ask an admin of the house for a new link.`

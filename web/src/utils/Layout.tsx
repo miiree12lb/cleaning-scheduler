@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { Navigate, Outlet, useParams } from "react-router";
 
 import Navbar from "./Navbar";
-import { type ThemeToggleProps } from "../types/types";
+import type { ThemeToggleProps, HouseContext } from "../types/types";
 import type { HouseSummary } from "../../../shared/types";
-import type { HouseContext } from "../types/types";
 import { useRefreshOnFocus } from "./useRefreshOnFocus";
+import { setLastHouseId } from "./lastHouse";
 
 type Status = "loading" | "ready" | "not-found" | "error";
 
@@ -29,13 +29,15 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
                 }
                 const data: HouseSummary = await res.json();
                 setHouse(data);
+                // Remember it, so the app opens this house next time
+                setLastHouseId(data.id);
                 setStatus("ready");
             } catch {
                 setStatus("error");
             }
         },
         [houseId],
-        );
+    );
 
     useEffect(() => {
         loadHouse(true);
@@ -46,7 +48,8 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
 
     if (status === "loading") return null;
     if (status === "not-found") return <Navigate to="/" replace />;
-    if (status === "error" || house === null) return <p>Couldn't load this house.</p>;
+    if (status === "error" || house === null)
+        return <p>Couldn't load this house.</p>;
 
     const context: HouseContext = {
         house,
@@ -55,7 +58,11 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
 
     return (
         <>
-            <Navbar theme={theme} toggleTheme={toggleTheme} houseName={house.name} />
+            <Navbar
+                theme={theme}
+                toggleTheme={toggleTheme}
+                houseName={house.name}
+            />
             <main>
                 <Outlet context={context} />
             </main>

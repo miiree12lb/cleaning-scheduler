@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../types/types";
 import type { SessionUser, HouseSummary } from "../../shared/types";
-import { parseName } from "../lib/validate";
+import { parseId, parseName } from "../lib/validate";
 import { randomHex } from "../lib/random";
-import { parseId } from "../lib/validate";
 import { requireAuth } from "../lib/auth";
 import { requireAdmin, requireMember } from "../lib/membership";
+import { LIMITS, countOf } from "../lib/limits";
 
 const houses = new Hono<AppEnv>();
 houses.use(requireAuth);
@@ -17,8 +17,10 @@ houses.get("/", async (c) => {
         FROM house_members
         JOIN houses ON houses.id = house_members.house_id
         WHERE house_members.user_id = ?
-        ORDER BY houses.name`
-    ).bind(user.id).all<HouseSummary>();
+        ORDER BY houses.name`,
+    )
+        .bind(user.id)
+        .all<HouseSummary>();
 
     return c.json(results);
 });
@@ -36,8 +38,10 @@ houses.get("/:id", async (c) => {
         FROM house_members
         JOIN houses ON houses.id = house_members.house_id
         WHERE house_members.user_id = ?
-          AND houses.id = ?`
-    ).bind(user.id, houseId).first<HouseSummary>();
+          AND houses.id = ?`,
+    )
+        .bind(user.id, houseId)
+        .first<HouseSummary>();
 
     if (!row) {
         return c.json({ error: "House not found" }, 404);
@@ -61,12 +65,28 @@ houses.post("/", async (c) => {
     }
     const name = nameResult.value;
 
+    const houseCount = await countOf(
+        c.env.DB,
+        "SELECT COUNT(*) AS count FROM house_members WHERE user_id = ?",
+        user.id,
+    );
+    if (houseCount >= LIMITS.housesPerUser) {
+        return c.json(
+            {
+                error: `You can be in at most ${LIMITS.housesPerUser} houses. Leave one first.`,
+            },
+            409,
+        );
+    }
+
     // The invite code is unique, so it identifies the new house in the statements below
     const inviteCode = randomHex(5);
     const newHouseId = "(SELECT id FROM houses WHERE invite_code = ?)";
 
     const results = await c.env.DB.batch([
-        c.env.DB.prepare("INSERT INTO houses (name, invite_code) VALUES (?, ?)").bind(name, inviteCode),
+        c.env.DB.prepare(
+            "INSERT INTO houses (name, invite_code) VALUES (?, ?)",
+        ).bind(name, inviteCode),
         c.env.DB.prepare(
             `INSERT INTO house_members (house_id, user_id, role, rotation_order)
              VALUES (${newHouseId}, ?, 'admin', 0)`,
@@ -98,12 +118,20 @@ houses.delete("/:houseId", requireMember, requireAdmin, async (c) => {
     if (!house) {
         return c.json({ error: "House not found" }, 404);
     }
-    if (typeof body?.confirmName !== "string" || body.confirmName.trim() !== house.name) {
-        return c.json({ error: "Type the house's name exactly to confirm" }, 400);
+    if (
+        typeof body?.confirmName !== "string" ||
+        body.confirmName.trim() !== house.name
+    ) {
+        return c.json(
+            { error: "Type the house's name exactly to confirm" },
+            400,
+        );
     }
 
     // Members, invites, tasks, schedule history and rules are deleted with it (ON DELETE CASCADE)
-    await c.env.DB.prepare("DELETE FROM houses WHERE id = ?").bind(houseId).run();
+    await c.env.DB.prepare("DELETE FROM houses WHERE id = ?")
+        .bind(houseId)
+        .run();
 
     return c.json({ ok: true });
 });

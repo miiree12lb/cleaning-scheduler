@@ -53,7 +53,9 @@ export default function App() {
 
                     <Route
                         path="/houses/:houseId"
-                        element={<Layout theme={theme} toggleTheme={toggleTheme} />}
+                        element={
+                            <Layout theme={theme} toggleTheme={toggleTheme} />
+                        }
                     >
                         <Route index element={<Calendar />} />
                         <Route path="calendar" element={<Calendar />} />

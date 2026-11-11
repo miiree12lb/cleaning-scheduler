@@ -14,7 +14,6 @@ export default function InviteSection({ houseId }: Props) {
     const [regenerating, setRegenerating] = useState(false);
     const [confirmingRegenerate, setConfirmingRegenerate] = useState(false);
     const inputId = useId();
-    
 
     useEffect(() => {
         async function fetchCode() {
@@ -26,8 +25,7 @@ export default function InviteSection({ houseId }: Props) {
                 }
                 const data: { code: string } = await res.json();
                 setCode(data.code);
-            }
-            catch {
+            } catch {
                 setError(true);
             }
         }
@@ -61,7 +59,10 @@ export default function InviteSection({ houseId }: Props) {
     async function regenerate() {
         setRegenerating(true);
         try {
-            const res = await fetch(`/api/houses/${houseId}/invite/regenerate`, { method: "POST" });
+            const res = await fetch(
+                `/api/houses/${houseId}/invite/regenerate`,
+                { method: "POST" },
+            );
             if (res.ok) {
                 const data: { code: string } = await res.json();
                 setCode(data.code);
@@ -91,14 +92,23 @@ export default function InviteSection({ houseId }: Props) {
                         readOnly
                         onFocus={(e) => e.target.select()}
                     />
-                    <button type="button" className="primary-button" onClick={copyLink}>
-                        {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+                    <button
+                        type="button"
+                        className="primary-button"
+                        onClick={copyLink}
+                    >
+                        {copied ? (
+                            <Check size={16} aria-hidden="true" />
+                        ) : (
+                            <Copy size={16} aria-hidden="true" />
+                        )}
                         {copied ? "Copied!" : "Copy"}
                     </button>
                 </div>
                 {copyFailed && (
                     <p className="form-error" role="alert">
-                        Couldn't copy automatically. Select the link and copy it by hand.
+                        Couldn't copy automatically. Select the link and copy it
+                        by hand.
                     </p>
                 )}
             </div>

@@ -12,7 +12,10 @@ import "../../css/rules.css";
 export default function Rules() {
     const { house } = useHouse();
     const { auth } = useAuth();
-    const me = auth.status === "authenticated" ? { id: auth.user.id, name: auth.user.name } : null;
+    const me =
+        auth.status === "authenticated"
+            ? { id: auth.user.id, name: auth.user.name }
+            : null;
     const isAdmin = house.role === "admin";
 
     const [sections, setSections] = useState<RuleSection[] | null>(null);
@@ -42,11 +45,17 @@ export default function Rules() {
     useRefreshOnFocus(loadSections);
 
     function replaceSection(updated: RuleSection) {
-        setSections((prev) => (prev === null ? prev : prev.map((s) => (s.id === updated.id ? updated : s))));
+        setSections((prev) =>
+            prev === null
+                ? prev
+                : prev.map((s) => (s.id === updated.id ? updated : s)),
+        );
     }
 
     function removeSection(id: number) {
-        setSections((prev) => (prev === null ? prev : prev.filter((s) => s.id !== id)));
+        setSections((prev) =>
+            prev === null ? prev : prev.filter((s) => s.id !== id),
+        );
     }
 
     function addSection(created: RuleSection) {
@@ -60,19 +69,27 @@ export default function Rules() {
 
         // Show the new order right away, then save it
         const reordered = [...sections];
-        [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+        [reordered[index], reordered[target]] = [
+            reordered[target],
+            reordered[index],
+        ];
         setSections(reordered);
 
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${house.id}/rules/sections/order`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ids: reordered.map((s) => s.id) }),
-            });
+            const res = await fetch(
+                `/api/houses/${house.id}/rules/sections/order`,
+                {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ids: reordered.map((s) => s.id) }),
+                },
+            );
             if (!res.ok) {
-                setActionError(await readError(res, "Could not save the new order."));
+                setActionError(
+                    await readError(res, "Could not save the new order."),
+                );
                 await loadSections();
                 return;
             }
@@ -93,7 +110,9 @@ export default function Rules() {
                 <p>The agreements everyone in {house.name} lives by.</p>
             </header>
 
-            {loadError && <p className="section-error">Could not load the rules.</p>}
+            {loadError && (
+                <p className="section-error">Could not load the rules.</p>
+            )}
 
             {actionError && (
                 <p className="section-error" role="alert">
@@ -103,7 +122,9 @@ export default function Rules() {
 
             {sections !== null && sections.length === 0 && (
                 <p className="rules-empty">
-                    {isAdmin ? "No rules yet. Start by adding a section below." : "No rules yet."}
+                    {isAdmin
+                        ? "No rules yet. Start by adding a section below."
+                        : "No rules yet."}
                 </p>
             )}
 
@@ -123,7 +144,9 @@ export default function Rules() {
                 />
             ))}
 
-            {isAdmin && sections !== null && <AddSectionForm houseId={house.id} onCreated={addSection} />}
+            {isAdmin && sections !== null && (
+                <AddSectionForm houseId={house.id} onCreated={addSection} />
+            )}
         </div>
     );
 }

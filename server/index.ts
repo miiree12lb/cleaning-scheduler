@@ -10,10 +10,11 @@ import members from "./routes/members";
 import weeks from "./routes/weeks";
 import rules from "./routes/rules";
 import { secureHeaders } from "hono/secure-headers";
-
+import { rateLimit } from "./lib/rateLimit";
 
 const app = new Hono<AppEnv>().basePath("/api");
 app.use("*", secureHeaders());
+app.use("/api/*", rateLimit("API_LIMITER"));
 
 app.route("/health", health);
 app.route("/auth", auth);

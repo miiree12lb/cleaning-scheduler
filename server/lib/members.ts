@@ -20,22 +20,23 @@ export async function removeMember(
 
     if (result.meta.changes === 1) {
         await db
-        .prepare(
-            `DELETE FROM section_members
+            .prepare(
+                `DELETE FROM section_members
              WHERE user_id = ?
                AND section_id IN (SELECT id FROM rule_sections WHERE house_id = ?)`,
-        )
-        .bind(userId, houseId)
-        .run();
+            )
+            .bind(userId, houseId)
+            .run();
         await reassignUnfinished(db, houseId, userId);
         return "removed";
     }
 
     const member = await db
-        .prepare("SELECT 1 FROM house_members WHERE house_id = ? AND user_id = ?")
+        .prepare(
+            "SELECT 1 FROM house_members WHERE house_id = ? AND user_id = ?",
+        )
         .bind(houseId, userId)
         .first();
 
     return member ? "last_admin" : "not_found";
 }
-

@@ -7,7 +7,12 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function Switch({ checked, onChange, label, disabled = false }: Props) {
+export default function Switch({
+    checked,
+    onChange,
+    label,
+    disabled = false,
+}: Props) {
     return (
         <label className="switch">
             <input
