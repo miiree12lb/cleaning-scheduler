@@ -114,12 +114,27 @@ auth.post("/register", rateLimit("AUTH_LIMITER"), async (c) => {
     const body = await readBody(c);
     if (!body) return c.json({ error: "Body must be JSON" }, 400);
 
+    // Each error says which field it's about, so the form can mark that field
     const nameResult = parseName(body.name);
-    if (!nameResult.ok) return c.json({ error: nameResult.error }, 400);
+    if (!nameResult.ok)
+        return c.json({ error: nameResult.error, field: "name" }, 400);
     const emailResult = parseEmail(body.email);
-    if (!emailResult.ok) return c.json({ error: emailResult.error }, 400);
+    if (!emailResult.ok)
+        return c.json({ error: emailResult.error, field: "email" }, 400);
     const passwordResult = parsePassword(body.password);
-    if (!passwordResult.ok) return c.json({ error: passwordResult.error }, 400);
+    if (!passwordResult.ok)
+        return c.json({ error: passwordResult.error, field: "password" }, 400);
+
+    // Only exactly true counts: a missing value, "true" as text, or 1 are all refused
+    if (body.ageConfirmed !== true) {
+        return c.json(
+            {
+                error: "You need to be 16 or older, and agree to the Terms, to create an account",
+                field: "ageConfirmed",
+            },
+            400,
+        );
+    }
 
     const name = nameResult.value;
     const email = emailResult.value;
@@ -140,6 +155,7 @@ auth.post("/register", rateLimit("AUTH_LIMITER"), async (c) => {
                 error: existing.hasPassword
                     ? "This email already has an account. Log in instead."
                     : "This email already uses Google login. Continue with Google instead.",
+                field: "email",
             },
             409,
         );
@@ -165,7 +181,10 @@ auth.post("/register", rateLimit("AUTH_LIMITER"), async (c) => {
         // Two sign-ups with the same email at the same moment: the UNIQUE index stops the second
         console.error("Registering failed:", err);
         return c.json(
-            { error: "This email already has an account. Log in instead." },
+            {
+                error: "This email already has an account. Log in instead.",
+                field: "email",
+            },
             409,
         );
     }

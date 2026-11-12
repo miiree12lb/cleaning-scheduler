@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ArrowLeft, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
-import { apiFetch } from "../utils/apiFetch";
 import ConfirmDialog from "../utils/ConfirmDialog";
+import { apiFetch } from "../utils/apiFetch";
+import { getLastHouseId } from "../utils/lastHouse";
 import "../css/settings.css";
 
 type BlockingHouse = { id: number; name: string };
 
 export default function Account() {
     const { auth, logout } = useAuth();
+    const navigate = useNavigate();
     const [confirming, setConfirming] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -17,6 +19,28 @@ export default function Account() {
 
     if (auth.status !== "authenticated") return null;
     const user = auth.user;
+
+    // Back to wherever you came from (a house, or the list). If you opened this page directly,
+    // there's nothing to go back to, so go to the last house you opened, or the list.
+    function goBack() {
+        const canGoBack =
+            ((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0;
+        if (canGoBack) {
+            navigate(-1);
+            return;
+        }
+        const lastId = getLastHouseId();
+        navigate(lastId ? `/houses/${lastId}` : "/");
+    }
+
+    async function logoutEverywhere() {
+        try {
+            await apiFetch("/api/auth/logout-everywhere", { method: "POST" });
+        } catch {
+            // Logged out locally either way
+        }
+        await logout();
+    }
 
     async function deleteAccount() {
         setDeleting(true);
@@ -47,24 +71,15 @@ export default function Account() {
         }
     }
 
-    async function logoutEverywhere() {
-        try {
-            await apiFetch("/api/auth/logout-everywhere", { method: "POST" });
-        } catch {
-            // Logged out locally either way
-        }
-        await logout();
-    }
-
     return (
         <div className="account-page">
-            <Link
-                to="/"
-                state={{ choose: true }}
+            <button
+                type="button"
+                onClick={goBack}
                 className="back-link account-back"
             >
-                <ArrowLeft size={16} aria-hidden="true" /> Back to my houses
-            </Link>
+                <ArrowLeft size={16} aria-hidden="true" /> Back
+            </button>
 
             <h1>Your account</h1>
 

@@ -15,7 +15,8 @@
     text-align: center;
 }
 
-.login-card p {
+/* Only the paragraphs directly in the card (subtitle, error at the top), not the ones in the form */
+.login-card > p {
     color: var(--text-muted);
     margin-bottom: 24px;
 }
@@ -58,8 +59,27 @@
 
 /* ---------- Email and password form ---------- */
 
+.password-form {
+    text-align: left;
+}
+
 .password-form .field {
     margin-bottom: 14px;
+}
+
+/* Messages under a field; some wrap onto two lines */
+.password-form .field-error {
+    line-height: 1.4;
+}
+
+/* Messages that aren't inside a .field (the age checkbox, and the general error above the button) */
+.password-form .form-message {
+    margin: -8px 0 14px;
+}
+
+/* Inside a field, the field already spaces it */
+.password-form .field .form-message {
+    margin: 0;
 }
 
 .password-form .primary-button {
@@ -105,7 +125,37 @@
     outline-offset: -2px;
 }
 
-/* "No Google account? Create one" */
+/* "I'm 16 or older, and I agree to the Terms" */
+.checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 16px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+}
+
+.checkbox-row input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.checkbox-row input[aria-invalid="true"] {
+    outline: 2px solid var(--danger);
+    outline-offset: 2px;
+}
+
+.checkbox-row a {
+    color: var(--accent);
+}
+
+/* "Already have an account? Log in" */
 .password-switch {
     margin: 14px 0 0;
     text-align: center;
@@ -133,12 +183,13 @@
     border-radius: 4px;
 }
 
-.password-form {
-    text-align: left;
-}
+/* ---------- Under the card ---------- */
 
 .login-privacy {
+    max-width: 100%;
+    box-sizing: border-box;
     margin: 20px 0 0;
+    padding: 0 16px;
     text-align: center;
     font-size: 0.8rem;
     color: var(--text-muted);
