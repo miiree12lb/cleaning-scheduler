@@ -320,4 +320,13 @@ auth.post("/logout", async (c) => {
     return c.json({ ok: true });
 });
 
+// Ends every session of this user, on every device (for a lost phone, or a shared computer)
+auth.post("/logout-everywhere", requireAuth, async (c) => {
+    await c.env.DB.prepare("DELETE FROM sessions WHERE user_id = ?")
+        .bind(c.get("user").id)
+        .run();
+    deleteCookie(c, "session", { path: "/" });
+    return c.json({ ok: true });
+});
+
 export default auth;

@@ -26,6 +26,7 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 - **No email verification**, since the app can't send email yet. Nobody can join a house without an invite link anyway.
 - **Login errors are the same for every failure** ("Wrong email or password"), and the hash always runs, even for an unknown email, so neither the message nor the response time reveals which emails have an account.
 - **Sessions:** a random token in an `httpOnly`, `SameSite=Lax`, `Secure` cookie. The database only stores the token's **SHA-256 hash**, so a leaked `sessions` table can't be used to log in. Sessions last 30 days, logging out deletes the session, and expired sessions are deleted at each login.
+- **Log out options:** Logging out ends this device’s session. ‘Log out on all devices’ deletes every session of the user.
 - **Google login** uses a `state` cookie to check that the login started in the same browser, and a `returnTo` path (only paths starting with `/` and not `//`) to go back to an invite link after logging in.
 - **Dev login** (`/api/auth/dev-login/:userId`) only exists when `DEV_LOGIN=true` in `.dev.vars`, for local testing. It must never be set in production. After each deploy, check that it answers "Not found".
 - **Deleting an account** is refused if the person is the only admin of any house (they must hand over admin or delete the house first). Otherwise they leave all their houses, their unfinished tasks this week go to their housemates, and their past activity stays as "Former member".

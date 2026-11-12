@@ -595,3 +595,9 @@
 .account-footer a:hover {
     color: var(--text);
 }
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

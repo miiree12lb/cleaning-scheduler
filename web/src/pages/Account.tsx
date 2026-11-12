@@ -47,6 +47,15 @@ export default function Account() {
         }
     }
 
+    async function logoutEverywhere() {
+        try {
+            await apiFetch("/api/auth/logout-everywhere", { method: "POST" });
+        } catch {
+            // Logged out locally either way
+        }
+        await logout();
+    }
+
     return (
         <div className="account-page">
             <Link
@@ -73,18 +82,30 @@ export default function Account() {
                     <h2>Log out</h2>
                 </header>
                 <p className="section-hint">
-                    Log out on this device. Your account and houses stay as they
-                    are.
+                    Log out on this device, or on all your devices at once (for
+                    example if you lost a phone). Your account and houses stay
+                    as they are.
                 </p>
 
-                <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={logout}
-                >
-                    <LogOut size={16} aria-hidden="true" />
-                    Log out
-                </button>
+                <div className="button-row">
+                    <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={logout}
+                    >
+                        <LogOut size={16} aria-hidden="true" />
+                        Log out
+                    </button>
+
+                    <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={logoutEverywhere}
+                    >
+                        <LogOut size={16} aria-hidden="true" />
+                        Log out on all devices
+                    </button>
+                </div>
             </section>
 
             <section className="settings-section danger-zone">
