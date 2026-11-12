@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { useState, useEffect, type ReactNode } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
 import { type Theme } from "./types/types";
 
+import ErrorBoundary from "./utils/ErrorBoundary";
 import RequireAuth from "./auth/RequireAuth";
 import Layout from "./utils/Layout";
 import Login from "./pages/Login";
@@ -46,34 +47,46 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
+            <PageBoundary>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
 
-                <Route element={<RequireAuth />}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/houses/new" element={<CreateHouse />} />
-                    <Route path="/join/:code" element={<JoinHouse />} />
-                    <Route path="/account" element={<Account />} />
+                    <Route element={<RequireAuth />}>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/houses/new" element={<CreateHouse />} />
+                        <Route path="/join/:code" element={<JoinHouse />} />
+                        <Route path="/account" element={<Account />} />
 
-                    <Route
-                        path="/houses/:houseId"
-                        element={
-                            <Layout theme={theme} toggleTheme={toggleTheme} />
-                        }
-                    >
-                        <Route index element={<Calendar />} />
-                        <Route path="calendar" element={<Calendar />} />
-                        <Route path="tasks" element={<Tasks />} />
-                        <Route path="rules" element={<Rules />} />
-                        <Route path="settings" element={<Settings />} />
-                        <Route path="*" element={<NotFound />} />
+                        <Route
+                            path="/houses/:houseId"
+                            element={
+                                <Layout
+                                    theme={theme}
+                                    toggleTheme={toggleTheme}
+                                />
+                            }
+                        >
+                            <Route index element={<Calendar />} />
+                            <Route path="calendar" element={<Calendar />} />
+                            <Route path="tasks" element={<Tasks />} />
+                            <Route path="rules" element={<Rules />} />
+                            <Route path="settings" element={<Settings />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Route>
                     </Route>
-                </Route>
 
-                <Route path="*" element={<NotFound />} />
-            </Routes>
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </PageBoundary>
         </BrowserRouter>
     );
+}
+
+// A new key on every page change resets the boundary, so a crash on one page
+// doesn't keep showing the error after navigating somewhere else
+function PageBoundary({ children }: { children: ReactNode }) {
+    const location = useLocation();
+    return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
 }
