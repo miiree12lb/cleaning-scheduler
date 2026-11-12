@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Trash2 } from "lucide-react";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
 import { readError } from "../../../utils/readError";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -23,7 +24,7 @@ export default function DangerZone({ houseId, houseName }: Props) {
         setDeleting(true);
         setError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}`, {
+            const res = await apiFetch(`/api/houses/${houseId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ confirmName }),

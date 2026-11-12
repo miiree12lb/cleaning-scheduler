@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import type { RuleSection } from "../../../../../shared/types";
 import Switch from "../../../utils/Switch";
 import { readError } from "../../../utils/readError";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -21,11 +22,14 @@ export default function AddSectionForm({ houseId, onCreated }: Props) {
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/rules/sections`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, optIn }),
-            });
+            const res = await apiFetch(
+                `/api/houses/${houseId}/rules/sections`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, optIn }),
+                },
+            );
             if (!res.ok) {
                 setError(await readError(res, "Could not add the section."));
                 return;

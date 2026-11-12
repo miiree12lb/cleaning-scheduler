@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { ChevronRight, CircleUser, Plus } from "lucide-react";
 import type { HouseSummary } from "../../../shared/types";
 import { getLastHouseId } from "../utils/lastHouse";
+import { apiFetch } from "../utils/apiFetch";
 
 import "../css/home.css";
 
@@ -32,7 +33,7 @@ export default function Home() {
     useEffect(() => {
         async function loadHouses() {
             try {
-                const res = await fetch("/api/houses");
+                const res = await apiFetch("/api/houses");
                 if (!res.ok) {
                     setError(true);
                     return;

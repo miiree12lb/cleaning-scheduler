@@ -10,7 +10,7 @@ export interface ThemeToggleProps {
 export type AuthState =
     | { status: "loading" }
     | { status: "authenticated"; user: SessionUser }
-    | { status: "unauthenticated" };
+    | { status: "unauthenticated"; expired?: boolean };
 
 export type AuthContextValue = {
     auth: AuthState;

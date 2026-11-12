@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import { apiFetch } from "../utils/apiFetch";
 import ConfirmDialog from "../utils/ConfirmDialog";
 import "../css/settings.css";
 
@@ -22,7 +23,7 @@ export default function Account() {
         setError(null);
         setBlocking([]);
         try {
-            const res = await fetch("/api/auth/me", { method: "DELETE" });
+            const res = await apiFetch("/api/auth/me", { method: "DELETE" });
             if (res.status === 409) {
                 const body: { houses?: BlockingHouse[] } = await res
                     .json()
@@ -125,7 +126,7 @@ export default function Account() {
                 </button>
             </section>
 
-            <p className="section-hint">
+            <p className="account-footer">
                 <Link to="/privacy">Privacy</Link> ·{" "}
                 <Link to="/terms">Terms</Link>
             </p>

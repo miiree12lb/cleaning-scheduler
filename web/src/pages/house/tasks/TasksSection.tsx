@@ -5,6 +5,7 @@ import ConfirmDialog from "../../../utils/ConfirmDialog";
 import AddTaskForm from "./AddTaskForm";
 import EditTaskRow from "./EditTaskRow";
 import { readError } from "../../../utils/readError";
+import { apiFetch } from "../../../utils/apiFetch";
 import "../../../css/settings.css";
 
 type Props = {
@@ -26,7 +27,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
             setTasks(null);
             setError(false);
             try {
-                const res = await fetch(`/api/houses/${houseId}/tasks`);
+                const res = await apiFetch(`/api/houses/${houseId}/tasks`);
                 if (!res.ok) {
                     setError(true);
                     return;
@@ -44,9 +45,12 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         setBusyId(task.id);
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}`, {
-                method: "DELETE",
-            });
+            const res = await apiFetch(
+                `/api/houses/${houseId}/tasks/${task.id}`,
+                {
+                    method: "DELETE",
+                },
+            );
             if (!res.ok) {
                 setActionError(
                     await readError(res, "Could not remove the task."),
@@ -75,7 +79,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         setBusyId(task.id);
         setActionError(null);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/houses/${houseId}/tasks/${task.id}/restore`,
                 {
                     method: "POST",

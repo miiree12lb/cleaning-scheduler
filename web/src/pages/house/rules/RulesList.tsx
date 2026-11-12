@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import type { Rule } from "../../../../../shared/types";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
 import { readError } from "../../../utils/readError";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -30,7 +31,7 @@ export default function RulesList({
 
     async function addRule(text: string): Promise<string | null> {
         try {
-            const res = await fetch(`${api}/sections/${sectionId}/rules`, {
+            const res = await apiFetch(`${api}/sections/${sectionId}/rules`, {
                 method: "POST",
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ text }),
@@ -46,7 +47,7 @@ export default function RulesList({
 
     async function saveRule(rule: Rule, text: string): Promise<string | null> {
         try {
-            const res = await fetch(`${api}/rules/${rule.id}`, {
+            const res = await apiFetch(`${api}/rules/${rule.id}`, {
                 method: "PATCH",
                 headers: JSON_HEADERS,
                 body: JSON.stringify({ text }),
@@ -66,7 +67,7 @@ export default function RulesList({
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(`${api}/rules/${rule.id}`, {
+            const res = await apiFetch(`${api}/rules/${rule.id}`, {
                 method: "DELETE",
             });
             if (!res.ok) {
@@ -98,7 +99,7 @@ export default function RulesList({
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `${api}/sections/${sectionId}/rules/order`,
                 {
                     method: "PUT",

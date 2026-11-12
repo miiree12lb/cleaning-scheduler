@@ -50,6 +50,14 @@ export default function Login() {
                     </p>
                 )}
 
+                {auth.status === "unauthenticated" &&
+                    auth.expired &&
+                    !error && (
+                        <p className="login-error" role="status">
+                            Your session ended. Log in again to continue.
+                        </p>
+                    )}
+
                 <a className="google-button" href={loginUrl}>
                     Sign in with Google
                 </a>

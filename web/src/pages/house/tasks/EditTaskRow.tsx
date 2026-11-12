@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
 import type { Task } from "../../../../../shared/types";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -29,13 +30,16 @@ export default function EditTaskRow({
         setSaving(true);
 
         try {
-            const res = await fetch(`/api/houses/${houseId}/tasks/${task.id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
+            const res = await apiFetch(
+                `/api/houses/${houseId}/tasks/${task.id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ name, description }),
                 },
-                body: JSON.stringify({ name, description }),
-            });
+            );
 
             if (!res.ok) {
                 const errorData = await res.json();

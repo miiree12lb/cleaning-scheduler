@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { type FormEvent } from "react";
 import { CircleUser } from "lucide-react";
+import { apiFetch } from "../utils/apiFetch";
 import "../css/createHouse.css";
 
 export default function CreateHouse() {
@@ -15,7 +16,7 @@ export default function CreateHouse() {
         setErrorMsg(null);
         e.preventDefault();
 
-        const res = await fetch("/api/houses", {
+        const res = await apiFetch("/api/houses", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -35,17 +36,13 @@ export default function CreateHouse() {
     }
 
     return (
-        <div className="centered-page">
-            <div className="card form-card">
-                <Link
-                    to="/account"
-                    className="home-account"
-                    title="Your account"
-                >
-                    <CircleUser size={18} aria-hidden="true" />
-                    <span>Account</span>
-                </Link>
+        <div className="centered-page stacked-page">
+            <Link to="/account" className="home-account" title="Your account">
+                <CircleUser size={18} aria-hidden="true" />
+                <span>Account</span>
+            </Link>
 
+            <div className="card form-card">
                 <h1>Create a house</h1>
 
                 <p className="card-subtitle">

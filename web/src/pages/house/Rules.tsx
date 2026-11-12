@@ -6,6 +6,7 @@ import { useRefreshOnFocus } from "../../utils/useRefreshOnFocus";
 import { readError } from "../../utils/readError";
 import SectionCard from "./rules/SectionCard";
 import AddSectionForm from "./rules/AddSectionForm";
+import { apiFetch } from "../../utils/apiFetch";
 import "../../css/settings.css";
 import "../../css/rules.css";
 
@@ -26,7 +27,7 @@ export default function Rules() {
     const loadSections = useCallback(async () => {
         setLoadError(false);
         try {
-            const res = await fetch(`/api/houses/${house.id}/rules`);
+            const res = await apiFetch(`/api/houses/${house.id}/rules`);
             if (!res.ok) {
                 setLoadError(true);
                 return;
@@ -78,7 +79,7 @@ export default function Rules() {
         setBusy(true);
         setActionError(null);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/houses/${house.id}/rules/sections/order`,
                 {
                     method: "PUT",

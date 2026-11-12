@@ -580,3 +580,18 @@
 .privacy-page a {
     color: var(--accent);
 }
+
+.account-footer {
+    margin: 8px 0 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.account-footer a {
+    color: var(--text-muted);
+}
+
+.account-footer a:hover {
+    color: var(--text);
+}

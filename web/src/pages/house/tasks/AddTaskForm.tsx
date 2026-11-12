@@ -1,6 +1,7 @@
 import { useState, type FormEvent, useId } from "react";
 import { Plus } from "lucide-react";
 import type { Task } from "../../../../../shared/types";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -27,7 +28,7 @@ export default function AddTaskForm({
         setSubmitting(true);
 
         try {
-            const res = await fetch(`/api/houses/${houseId}/tasks`, {
+            const res = await apiFetch(`/api/houses/${houseId}/tasks`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, description }),

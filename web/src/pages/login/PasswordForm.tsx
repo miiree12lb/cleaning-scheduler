@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent } from "react";
 import { readError } from "../../utils/readError";
+import { apiFetch } from "../../utils/apiFetch";
 import { Eye, EyeOff } from "lucide-react";
 
 type Mode = "login" | "register";
@@ -32,7 +33,7 @@ export default function PasswordForm({ returnTo }: Props) {
         setSubmitting(true);
         setError(null);
         try {
-            const res = await fetch(`/api/auth/${mode}`, {
+            const res = await apiFetch(`/api/auth/${mode}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(

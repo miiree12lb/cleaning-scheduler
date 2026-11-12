@@ -1,10 +1,17 @@
 #houses-list-holder {
     min-height: 100vh;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
     padding: 16px;
 }
 
+/* The gap already spaces it from the card */
+#houses-list-holder > .home-account {
+    margin: 0;
+}
 .picker-card {
     width: 100%;
     max-width: 400px;

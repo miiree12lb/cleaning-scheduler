@@ -4,6 +4,7 @@ import type { RuleSection } from "../../../../../shared/types";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
 import Switch from "../../../utils/Switch";
 import { readError } from "../../../utils/readError";
+import { apiFetch } from "../../../utils/apiFetch";
 import RulesList from "./RulesList";
 
 type Props = {
@@ -49,7 +50,7 @@ export default function SectionCard({
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(base, {
+            const res = await apiFetch(base, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(changes),
@@ -86,7 +87,7 @@ export default function SectionCard({
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(base, { method: "DELETE" });
+            const res = await apiFetch(base, { method: "DELETE" });
             if (!res.ok) {
                 setError(await readError(res, "Could not delete the section."));
                 return;
@@ -104,7 +105,7 @@ export default function SectionCard({
         setSaving(true);
         setError(null);
         try {
-            const res = await fetch(`${base}/me`, {
+            const res = await apiFetch(`${base}/me`, {
                 method: value ? "PUT" : "DELETE",
             });
             if (!res.ok) {

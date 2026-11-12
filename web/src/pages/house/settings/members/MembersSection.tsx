@@ -7,6 +7,7 @@ import { useHouse } from "../../../../utils/useHouse";
 import { useRefreshOnFocus } from "../../../../utils/useRefreshOnFocus";
 import { readError } from "../../../../utils/readError";
 import ConfirmDialog from "../../../../utils/ConfirmDialog";
+import { apiFetch } from "../../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -34,7 +35,7 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
             if (showLoading) setMembers(null);
             setLoadError(false);
             try {
-                const res = await fetch(`/api/houses/${houseId}/members`);
+                const res = await apiFetch(`/api/houses/${houseId}/members`);
                 if (!res.ok) {
                     setLoadError(true);
                     return;
@@ -58,7 +59,7 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
     async function leaveHouse() {
         setActionError(null);
         try {
-            const res = await fetch(`/api/houses/${houseId}/members/me`, {
+            const res = await apiFetch(`/api/houses/${houseId}/members/me`, {
                 method: "DELETE",
             });
             if (!res.ok) {
@@ -77,7 +78,7 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
         setBusyId(member.id);
         setActionError(null);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/houses/${houseId}/members/${member.id}/role`,
                 {
                     method: "PATCH",
@@ -112,7 +113,7 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
         setBusyId(member.id);
         setActionError(null);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/houses/${houseId}/members/${member.id}`,
                 { method: "DELETE" },
             );

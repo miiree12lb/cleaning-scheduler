@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { SessionUser } from "../../../shared/types";
 import type { AuthState, AuthContextValue } from "../types/types";
+import { onSessionExpired } from "../utils/apiFetch";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -34,6 +35,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
         loadUser();
+    }, []);
+
+    // Any API call that gets a 401 ends up here: the session is over, so show the login page
+    useEffect(() => {
+        return onSessionExpired(() => {
+            setAuth((current) =>
+                current.status === "authenticated"
+                    ? { status: "unauthenticated", expired: true }
+                    : current,
+            );
+        });
     }, []);
 
     async function logout() {

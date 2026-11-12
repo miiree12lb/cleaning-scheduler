@@ -150,3 +150,16 @@
 .home-account:hover {
     border-color: var(--accent);
 }
+
+/* A page with the Account button above its card, centered together (like Home) */
+.stacked-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.stacked-page > .home-account {
+    margin: 0;
+}

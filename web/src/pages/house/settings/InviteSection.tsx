@@ -1,6 +1,7 @@
 import { useState, useEffect, useId } from "react";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
+import { apiFetch } from "../../../utils/apiFetch";
 
 type Props = {
     houseId: number;
@@ -18,7 +19,7 @@ export default function InviteSection({ houseId }: Props) {
     useEffect(() => {
         async function fetchCode() {
             try {
-                const res = await fetch(`/api/houses/${houseId}/invite`);
+                const res = await apiFetch(`/api/houses/${houseId}/invite`);
                 if (!res.ok) {
                     setError(true);
                     return;
@@ -59,7 +60,7 @@ export default function InviteSection({ houseId }: Props) {
     async function regenerate() {
         setRegenerating(true);
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/houses/${houseId}/invite/regenerate`,
                 { method: "POST" },
             );

@@ -6,6 +6,7 @@ import type { ThemeToggleProps, HouseContext } from "../types/types";
 import type { HouseSummary } from "../../../shared/types";
 import { useRefreshOnFocus } from "./useRefreshOnFocus";
 import { setLastHouseId } from "./lastHouse";
+import { apiFetch } from "./apiFetch";
 import NotFound from "../pages/NotFound";
 
 type Status = "loading" | "ready" | "not-found" | "error";
@@ -19,7 +20,7 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
         async (showLoading: boolean) => {
             if (showLoading) setStatus("loading");
             try {
-                const res = await fetch(`/api/houses/${houseId}`);
+                const res = await apiFetch(`/api/houses/${houseId}`);
                 if (res.status === 404 || res.status === 400) {
                     setStatus("not-found");
                     return;

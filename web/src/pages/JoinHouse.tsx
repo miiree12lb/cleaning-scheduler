@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import type { HouseSummary } from "../../../shared/types";
+import { apiFetch } from "../utils/apiFetch";
 
 type JoinState =
     | { status: "joining" }
@@ -17,7 +18,7 @@ export default function JoinHouse() {
 
         async function joinHouse() {
             try {
-                const res = await fetch(`/api/join/${code}`, {
+                const res = await apiFetch(`/api/join/${code}`, {
                     method: "POST",
                 });
 
