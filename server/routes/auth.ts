@@ -19,6 +19,14 @@ const auth = new Hono<AppEnv>();
 
 // ---------- Helpers ----------
 
+// Only paths inside this app: "/join/abc". Not "//evil.com" or "/\evil.com",
+// which browsers treat as another website.
+function safeReturnTo(value: string | undefined): string | null {
+    if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
+    if (/[\\\s]/.test(value)) return null; // no backslashes, spaces or line breaks
+    return value;
+}
+
 // Read the JSON body; null if it isn't valid JSON
 async function readBody(
     c: Context<AppEnv>,
@@ -215,8 +223,8 @@ auth.get("/login", rateLimit("AUTH_LIMITER", "redirect"), (c) => {
     });
 
     // Where to go after logging in (e.g. an invite link), only paths inside this app
-    const returnTo = c.req.query("returnTo");
-    if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+    const returnTo = safeReturnTo(c.req.query("returnTo"));
+    if (returnTo) {
         setCookie(c, "oauth_return", returnTo, {
             path: "/api/auth",
             httpOnly: true,
@@ -241,7 +249,7 @@ auth.get("/login", rateLimit("AUTH_LIMITER", "redirect"), (c) => {
 auth.get("/callback", rateLimit("AUTH_LIMITER", "redirect"), async (c) => {
     // Read and clear the short-lived login cookies
     const expectedState = getCookie(c, "oauth_state");
-    const returnTo = getCookie(c, "oauth_return");
+    const returnTo = safeReturnTo(getCookie(c, "oauth_return"));
     deleteCookie(c, "oauth_state", { path: "/api/auth" });
     deleteCookie(c, "oauth_return", { path: "/api/auth" });
 

@@ -1,5 +1,4 @@
-import { Navigate, useSearchParams } from "react-router";
-import { Link } from "react-router";
+import { Link, Navigate, useSearchParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import PasswordForm from "./login/PasswordForm";
 import "../css/login.css";
@@ -7,21 +6,24 @@ import "../css/login.css";
 const ERRORS: Record<string, string> = {
     cancelled: "Sign-in was cancelled.",
     failed: "Sign-in didn't work. Please try again.",
-    email_in_use: "This email address already belongs to another account.",
+    email_in_use:
+        "This email already has an account with a password. Log in with your email and password below.",
     too_many: "Too many login attempts. Wait a minute and try again.",
 };
+
+// Only paths inside this app: "/join/abc". Not "//evil.com" or "/\evil.com",
+// which browsers treat as another website. The server checks it the same way.
+function safeReturnTo(value: string | null): string | null {
+    if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
+    if (/[\\\s]/.test(value)) return null; // no backslashes, spaces or line breaks
+    return value;
+}
 
 export default function Login() {
     const { auth } = useAuth();
     const [searchParams] = useSearchParams();
 
-    // Only paths inside this app, never another site
-    const requested = searchParams.get("returnTo") ?? "/";
-    const returnTo =
-        requested.startsWith("/") && !requested.startsWith("//")
-            ? requested
-            : "/";
-
+    const returnTo = safeReturnTo(searchParams.get("returnTo")) ?? "/";
     const error = searchParams.get("error");
 
     // Already logged in: go straight to where they were heading
@@ -56,7 +58,7 @@ export default function Login() {
                     <span>or</span>
                 </div>
 
-                <PasswordForm returnTo={returnTo ?? "/"} />
+                <PasswordForm returnTo={returnTo} />
             </div>
 
             <p className="login-privacy">

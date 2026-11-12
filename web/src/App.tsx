@@ -20,9 +20,11 @@ import Terms from "./pages/Terms";
 
 export default function App() {
     const [theme, setTheme] = useState<Theme>(() => {
-        const saved = localStorage.getItem("theme");
-        if (saved === "light" || saved === "dark") {
-            return saved;
+        try {
+            const saved = localStorage.getItem("theme");
+            if (saved === "light" || saved === "dark") return saved;
+        } catch {
+            // Storage blocked: fall back to the system preference
         }
         return window.matchMedia("(prefers-color-scheme: dark)").matches
             ? "dark"
@@ -31,7 +33,11 @@ export default function App() {
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
+        try {
+            localStorage.setItem("theme", theme);
+        } catch {
+            // Not saved; the theme still works for this visit
+        }
     }, [theme]);
 
     const toggleTheme = () => {
@@ -62,6 +68,7 @@ export default function App() {
                         <Route path="tasks" element={<Tasks />} />
                         <Route path="rules" element={<Rules />} />
                         <Route path="settings" element={<Settings />} />
+                        <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
 

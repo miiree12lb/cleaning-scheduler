@@ -1,0 +1,22 @@
+main .centered-page {
+    min-height: 60vh;
+}
+
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.not-found-icon {
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.not-found-button {
+    display: inline-flex;
+    justify-content: center;
+    margin-top: 4px;
+    text-decoration: none;
+}

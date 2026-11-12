@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
-import { Navigate, Outlet, useParams } from "react-router";
+import { Outlet, useParams } from "react-router";
 
 import Navbar from "./Navbar";
 import type { ThemeToggleProps, HouseContext } from "../types/types";
 import type { HouseSummary } from "../../../shared/types";
 import { useRefreshOnFocus } from "./useRefreshOnFocus";
 import { setLastHouseId } from "./lastHouse";
+import NotFound from "../pages/NotFound";
 
 type Status = "loading" | "ready" | "not-found" | "error";
 
@@ -47,7 +48,14 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
     useRefreshOnFocus(reloadQuietly);
 
     if (status === "loading") return null;
-    if (status === "not-found") return <Navigate to="/" replace />;
+    if (status === "not-found") {
+        return (
+            <NotFound
+                title="House not found"
+                message="This house doesn't exist anymore, or you're no longer a member."
+            />
+        );
+    }
     if (status === "error" || house === null)
         return <p>Couldn't load this house.</p>;
 
