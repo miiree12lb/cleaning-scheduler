@@ -8,6 +8,7 @@ import { useRefreshOnFocus } from "./useRefreshOnFocus";
 import { setLastHouseId } from "./lastHouse";
 import { apiFetch } from "./apiFetch";
 import NotFound from "../pages/NotFound";
+import ErrorState from "./ErrorState";
 
 type Status = "loading" | "ready" | "not-found" | "error";
 
@@ -22,20 +23,22 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
             try {
                 const res = await apiFetch(`/api/houses/${houseId}`);
                 if (res.status === 404 || res.status === 400) {
+                    // Deleted, or no longer a member: show that, even during a quiet refresh
                     setStatus("not-found");
                     return;
                 }
                 if (!res.ok) {
-                    setStatus("error");
+                    // A failed quiet refresh keeps the house that's already shown
+                    if (showLoading) setStatus("error");
                     return;
                 }
                 const data: HouseSummary = await res.json();
                 setHouse(data);
-                // Remember it, so the app opens this house next time
                 setLastHouseId(data.id);
                 setStatus("ready");
             } catch {
-                setStatus("error");
+                // Offline: same, keep what's shown if it's only a refresh
+                if (showLoading) setStatus("error");
             }
         },
         [houseId],
@@ -49,6 +52,7 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
     useRefreshOnFocus(reloadQuietly);
 
     if (status === "loading") return null;
+
     if (status === "not-found") {
         return (
             <NotFound
@@ -57,8 +61,17 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
             />
         );
     }
-    if (status === "error" || house === null)
-        return <p>Couldn't load this house.</p>;
+
+    if (status === "error" || house === null) {
+        return (
+            <div className="error-page">
+                <ErrorState
+                    title="Couldn't load this house"
+                    onRetry={() => loadHouse(true)}
+                />
+            </div>
+        );
+    }
 
     const context: HouseContext = {
         house,

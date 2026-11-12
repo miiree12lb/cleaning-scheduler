@@ -1,7 +1,10 @@
-import { useState, useEffect, useId } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
 import { apiFetch } from "../../../utils/apiFetch";
+import { readError } from "../../../utils/readError";
+import { useRefreshOnFocus } from "../../../utils/useRefreshOnFocus";
+import ErrorState from "../../../utils/ErrorState";
 
 type Props = {
     houseId: number;
@@ -13,31 +16,44 @@ export default function InviteSection({ houseId }: Props) {
     const [copied, setCopied] = useState(false);
     const [copyFailed, setCopyFailed] = useState(false);
     const [regenerating, setRegenerating] = useState(false);
+    const [regenerateError, setRegenerateError] = useState<string | null>(null);
     const [confirmingRegenerate, setConfirmingRegenerate] = useState(false);
     const inputId = useId();
 
-    useEffect(() => {
-        async function fetchCode() {
+    // quiet: a background refresh. If it fails, the link already shown stays.
+    const loadInvite = useCallback(
+        async (quiet = false) => {
+            if (!quiet) setError(false);
             try {
                 const res = await apiFetch(`/api/houses/${houseId}/invite`);
                 if (!res.ok) {
-                    setError(true);
+                    if (!quiet) setError(true);
                     return;
                 }
                 const data: { code: string } = await res.json();
                 setCode(data.code);
             } catch {
-                setError(true);
+                if (!quiet) setError(true);
             }
-        }
+        },
+        [houseId],
+    );
 
-        fetchCode();
-    }, [houseId]);
+    useEffect(() => {
+        loadInvite();
+    }, [loadInvite]);
+
+    // Another admin may have created a new link while this page was open
+    const refreshQuietly = useCallback(() => loadInvite(true), [loadInvite]);
+    useRefreshOnFocus(refreshQuietly);
 
     if (error) {
         return (
             <section className="settings-section">
-                <p className="section-error">Could not load the invite link.</p>
+                <ErrorState
+                    title="Couldn't load the invite link"
+                    onRetry={() => loadInvite()}
+                />
             </section>
         );
     }
@@ -59,15 +75,22 @@ export default function InviteSection({ houseId }: Props) {
 
     async function regenerate() {
         setRegenerating(true);
+        setRegenerateError(null);
         try {
             const res = await apiFetch(
                 `/api/houses/${houseId}/invite/regenerate`,
                 { method: "POST" },
             );
-            if (res.ok) {
-                const data: { code: string } = await res.json();
-                setCode(data.code);
+            if (!res.ok) {
+                setRegenerateError(
+                    await readError(res, "Could not create a new link."),
+                );
+                return;
             }
+            const data: { code: string } = await res.json();
+            setCode(data.code);
+        } catch {
+            setRegenerateError("Could not reach the server.");
         } finally {
             setRegenerating(false);
         }
@@ -123,6 +146,12 @@ export default function InviteSection({ houseId }: Props) {
                 <RefreshCw size={16} aria-hidden="true" />
                 <span>{regenerating ? "Creating…" : "Create a new link"}</span>
             </button>
+
+            {regenerateError && (
+                <p className="form-error" role="alert">
+                    {regenerateError}
+                </p>
+            )}
 
             <ConfirmDialog
                 open={confirmingRegenerate}

@@ -8,6 +8,7 @@ import { useRefreshOnFocus } from "../../../../utils/useRefreshOnFocus";
 import { readError } from "../../../../utils/readError";
 import ConfirmDialog from "../../../../utils/ConfirmDialog";
 import { apiFetch } from "../../../../utils/apiFetch";
+import ErrorState from "../../../../utils/ErrorState";
 
 type Props = {
     houseId: number;
@@ -136,7 +137,10 @@ export default function MembersSection({ houseId, isAdmin }: Props) {
     if (loadError) {
         return (
             <section className="settings-section">
-                <p className="section-error">Could not load the members.</p>
+                <ErrorState
+                    title="Couldn't load the members"
+                    onRetry={() => loadMembers(true)}
+                />
             </section>
         );
     }

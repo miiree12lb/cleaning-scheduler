@@ -397,3 +397,7 @@
     letter-spacing: 0.03em;
     text-decoration: none;
 }
+
+.week-page > .error-state + .secondary-button {
+    margin-top: 12px;
+}

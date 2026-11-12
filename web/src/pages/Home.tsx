@@ -1,9 +1,10 @@
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, useCallback, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { ChevronRight, CircleUser, Plus } from "lucide-react";
 import type { HouseSummary } from "../../../shared/types";
 import { getLastHouseId } from "../utils/lastHouse";
 import { apiFetch } from "../utils/apiFetch";
+import ErrorState from "../utils/ErrorState";
 
 import "../css/home.css";
 
@@ -30,22 +31,24 @@ export default function Home() {
     const choosing =
         (location.state as { choose?: boolean } | null)?.choose === true;
 
-    useEffect(() => {
-        async function loadHouses() {
-            try {
-                const res = await apiFetch("/api/houses");
-                if (!res.ok) {
-                    setError(true);
-                    return;
-                }
-                const resHouses: HouseSummary[] = await res.json();
-                setHouses(resHouses);
-            } catch {
+    const loadHouses = useCallback(async () => {
+        setError(false);
+        try {
+            const res = await apiFetch("/api/houses");
+            if (!res.ok) {
                 setError(true);
+                return;
             }
+            const resHouses: HouseSummary[] = await res.json();
+            setHouses(resHouses);
+        } catch {
+            setError(true);
         }
-        loadHouses();
     }, []);
+
+    useEffect(() => {
+        loadHouses();
+    }, [loadHouses]);
 
     function handleJoin(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -59,7 +62,14 @@ export default function Home() {
     }
 
     if (error) {
-        return <p>Couldn't load your houses.</p>;
+        return (
+            <div className="error-page">
+                <ErrorState
+                    title="Couldn't load your houses"
+                    onRetry={loadHouses}
+                />
+            </div>
+        );
     }
 
     if (houses === null) {

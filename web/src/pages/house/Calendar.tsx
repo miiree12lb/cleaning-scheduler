@@ -5,6 +5,7 @@ import { useHouse } from "../../utils/useHouse";
 import { useWeek } from "../../utils/useWeek";
 import { addWeeks, formatWeekRange } from "../../utils/dates";
 import WeekView from "./WeekView";
+import ErrorState from "../../utils/ErrorState";
 import "../../css/week.css";
 
 const MAX_WEEKS_AHEAD = 4;
@@ -23,19 +24,28 @@ export default function Calendar() {
     const [searchParams, setSearchParams] = useSearchParams();
     const week = searchParams.get("week") ?? "current";
 
-    const { plan, loading, error, actionError, busyTaskId, toggleDone } =
-        useWeek(house.id, week);
+    const {
+        plan,
+        loading,
+        error,
+        actionError,
+        busyTaskId,
+        toggleDone,
+        reload,
+    } = useWeek(house.id, week);
 
     if (error) {
         return (
             <div className="week-page">
-                <p className="section-error">Couldn't load this week.</p>
-                <button
-                    className="secondary-button"
-                    onClick={() => setSearchParams({})}
-                >
-                    Go to this week
-                </button>
+                <ErrorState title="Couldn't load this week" onRetry={reload} />
+                {week !== "current" && (
+                    <button
+                        className="secondary-button"
+                        onClick={() => setSearchParams({})}
+                    >
+                        Go to this week
+                    </button>
+                )}
             </div>
         );
     }

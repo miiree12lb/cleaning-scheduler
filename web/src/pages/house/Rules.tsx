@@ -7,6 +7,7 @@ import { readError } from "../../utils/readError";
 import SectionCard from "./rules/SectionCard";
 import AddSectionForm from "./rules/AddSectionForm";
 import { apiFetch } from "../../utils/apiFetch";
+import ErrorState from "../../utils/ErrorState";
 import "../../css/settings.css";
 import "../../css/rules.css";
 
@@ -112,7 +113,10 @@ export default function Rules() {
             </header>
 
             {loadError && (
-                <p className="section-error">Could not load the rules.</p>
+                <ErrorState
+                    title="Couldn't load the rules"
+                    onRetry={loadSections}
+                />
             )}
 
             {actionError && (

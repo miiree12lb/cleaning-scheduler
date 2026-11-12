@@ -72,5 +72,13 @@ export function useWeek(houseId: number, week: string) {
         }
     }
 
-    return { plan, loading, error, actionError, busyTaskId, toggleDone };
+    return {
+        plan,
+        loading,
+        error,
+        actionError,
+        busyTaskId,
+        toggleDone,
+        reload: loadWeek,
+    };
 }

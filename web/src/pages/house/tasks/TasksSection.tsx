@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Archive, ArchiveRestore, Pencil } from "lucide-react";
 import type { Task } from "../../../../../shared/types";
 import ConfirmDialog from "../../../utils/ConfirmDialog";
@@ -6,6 +6,7 @@ import AddTaskForm from "./AddTaskForm";
 import EditTaskRow from "./EditTaskRow";
 import { readError } from "../../../utils/readError";
 import { apiFetch } from "../../../utils/apiFetch";
+import ErrorState from "../../../utils/ErrorState";
 import "../../../css/settings.css";
 
 type Props = {
@@ -22,24 +23,25 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
     const [pendingRemoval, setPendingRemoval] = useState<Task | null>(null);
     const [pendingRestore, setPendingRestore] = useState<Task | null>(null);
 
-    useEffect(() => {
-        async function fetchTasks() {
-            setTasks(null);
-            setError(false);
-            try {
-                const res = await apiFetch(`/api/houses/${houseId}/tasks`);
-                if (!res.ok) {
-                    setError(true);
-                    return;
-                }
-                const data: Task[] = await res.json();
-                setTasks(data);
-            } catch {
+    const loadTasks = useCallback(async () => {
+        setTasks(null);
+        setError(false);
+        try {
+            const res = await apiFetch(`/api/houses/${houseId}/tasks`);
+            if (!res.ok) {
                 setError(true);
+                return;
             }
+            const data: Task[] = await res.json();
+            setTasks(data);
+        } catch {
+            setError(true);
         }
-        fetchTasks();
     }, [houseId]);
+
+    useEffect(() => {
+        loadTasks();
+    }, [loadTasks]);
 
     async function removeTask(task: Task) {
         setBusyId(task.id);
@@ -107,7 +109,10 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
     if (error) {
         return (
             <section className="settings-section">
-                <p className="section-error">Could not load the tasks.</p>
+                <ErrorState
+                    title="Couldn't load the tasks"
+                    onRetry={loadTasks}
+                />
             </section>
         );
     }
