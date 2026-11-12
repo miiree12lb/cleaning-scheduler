@@ -2,7 +2,10 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 import { RotateCw } from "lucide-react";
 import "../css/errorState.css";
 
-type Props = { children: ReactNode };
+type Props = {
+    children: ReactNode;
+    resetKey?: string; // when this changes (a new page), a previous crash is forgotten
+};
 type State = { crashed: boolean };
 
 // If anything inside crashes while rendering, show a friendly message instead of a white page
@@ -16,6 +19,13 @@ export default class ErrorBoundary extends Component<Props, State> {
     componentDidCatch(error: Error, info: ErrorInfo) {
         // Stays in the browser console, for debugging
         console.error("The app crashed:", error, info.componentStack);
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        // Navigating to another page gives it a fresh start, without rebuilding the whole app
+        if (this.state.crashed && prevProps.resetKey !== this.props.resetKey) {
+            this.setState({ crashed: false });
+        }
     }
 
     render() {

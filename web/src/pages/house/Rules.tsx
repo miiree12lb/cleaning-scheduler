@@ -8,6 +8,8 @@ import SectionCard from "./rules/SectionCard";
 import AddSectionForm from "./rules/AddSectionForm";
 import { apiFetch } from "../../utils/apiFetch";
 import ErrorState from "../../utils/ErrorState";
+import { useDelayedFlag } from "../../utils/useDelayedFlag";
+import { RowsSkeleton } from "../../utils/Skeleton";
 import "../../css/settings.css";
 import "../../css/rules.css";
 
@@ -45,6 +47,7 @@ export default function Rules() {
     }, [loadSections]);
 
     useRefreshOnFocus(loadSections);
+    const showSkeleton = useDelayedFlag(sections === null && !loadError);
 
     function replaceSection(updated: RuleSection) {
         setSections((prev) =>
@@ -118,6 +121,8 @@ export default function Rules() {
                     onRetry={loadSections}
                 />
             )}
+
+            {sections === null && showSkeleton && <RowsSkeleton />}
 
             {actionError && (
                 <p className="section-error" role="alert">

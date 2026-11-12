@@ -7,6 +7,8 @@ import EditTaskRow from "./EditTaskRow";
 import { readError } from "../../../utils/readError";
 import { apiFetch } from "../../../utils/apiFetch";
 import ErrorState from "../../../utils/ErrorState";
+import { useDelayedFlag } from "../../../utils/useDelayedFlag";
+import { RowsSkeleton } from "../../../utils/Skeleton";
 import "../../../css/settings.css";
 
 type Props = {
@@ -106,6 +108,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         }
     }
 
+    const showSkeleton = useDelayedFlag(tasks === null && !error);
     if (error) {
         return (
             <section className="settings-section">
@@ -117,7 +120,7 @@ export default function TasksSection({ houseId, isAdmin }: Props) {
         );
     }
 
-    if (tasks === null) return null;
+    if (tasks === null) return showSkeleton ? <RowsSkeleton /> : null;
 
     const active = tasks.filter((t) => t.active === 1);
     const archived = tasks.filter((t) => t.active === 0);

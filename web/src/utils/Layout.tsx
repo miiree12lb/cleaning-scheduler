@@ -9,6 +9,8 @@ import { setLastHouseId } from "./lastHouse";
 import { apiFetch } from "./apiFetch";
 import NotFound from "../pages/NotFound";
 import ErrorState from "./ErrorState";
+import { useDelayedFlag } from "./useDelayedFlag";
+import { AppSkeleton } from "./Skeleton";
 
 type Status = "loading" | "ready" | "not-found" | "error";
 
@@ -51,7 +53,8 @@ export default function Layout({ theme, toggleTheme }: ThemeToggleProps) {
     const reloadQuietly = useCallback(() => loadHouse(false), [loadHouse]);
     useRefreshOnFocus(reloadQuietly);
 
-    if (status === "loading") return null;
+    const showSkeleton = useDelayedFlag(status === "loading");
+    if (status === "loading") return showSkeleton ? <AppSkeleton /> : null;
 
     if (status === "not-found") {
         return (

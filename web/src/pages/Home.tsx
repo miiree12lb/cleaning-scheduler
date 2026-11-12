@@ -5,6 +5,8 @@ import type { HouseSummary } from "../../../shared/types";
 import { getLastHouseId } from "../utils/lastHouse";
 import { apiFetch } from "../utils/apiFetch";
 import ErrorState from "../utils/ErrorState";
+import { useDelayedFlag } from "../utils/useDelayedFlag";
+import { SkeletonBlock, SkeletonPage } from "../utils/Skeleton";
 
 import "../css/home.css";
 
@@ -61,6 +63,7 @@ export default function Home() {
         navigate(`/join/${code}`);
     }
 
+    const showSkeleton = useDelayedFlag(houses === null && !error);
     if (error) {
         return (
             <div className="error-page">
@@ -73,7 +76,16 @@ export default function Home() {
     }
 
     if (houses === null) {
-        return null; // still loading
+        return showSkeleton ? (
+            <SkeletonPage className="error-page">
+                <div className="picker-card skeleton-stack">
+                    <SkeletonBlock width={160} height={26} />
+                    <SkeletonBlock width={200} height={14} />
+                    <SkeletonBlock height={60} radius={12} />
+                    <SkeletonBlock height={60} radius={12} />
+                </div>
+            </SkeletonPage>
+        ) : null;
     }
 
     if (!choosing) {

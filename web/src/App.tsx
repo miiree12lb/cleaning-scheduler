@@ -84,9 +84,11 @@ export default function App() {
     );
 }
 
-// A new key on every page change resets the boundary, so a crash on one page
+// Resets the boundary on every page change, so a crash on one page
 // doesn't keep showing the error after navigating somewhere else
 function PageBoundary({ children }: { children: ReactNode }) {
     const location = useLocation();
-    return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
+    return (
+        <ErrorBoundary resetKey={location.pathname}>{children}</ErrorBoundary>
+    );
 }

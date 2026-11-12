@@ -5,9 +5,28 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Cleaning Scheduler</title>
+        <style>
+            /* Shown until the JavaScript has loaded. The app's CSS isn't there yet, so it's styled here. */
+            .boot-loading {
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+                font-family: system-ui, sans-serif;
+                color: #888;
+            }
+
+            /* Only while the app hasn't set its own theme yet (html has no data-theme) */
+            @media (prefers-color-scheme: dark) {
+                html:not([data-theme]) body {
+                    background: #171715;
+                }
+            }
+        </style>
     </head>
     <body>
-        <div id="root"></div>
+        <div id="root">
+            <div class="boot-loading" role="status">Loading…</div>
+        </div>
         <script type="module" src="/src/main.tsx"></script>
     </body>
 </html>
