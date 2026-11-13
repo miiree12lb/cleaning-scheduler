@@ -26,15 +26,8 @@ export default function Calendar() {
     const [searchParams, setSearchParams] = useSearchParams();
     const week = searchParams.get("week") ?? "current";
 
-    const {
-        plan,
-        loading,
-        error,
-        actionError,
-        busyTaskId,
-        toggleDone,
-        reload,
-    } = useWeek(house.id, week);
+    const me = auth.status === "authenticated" ? { id: auth.user.id, name: auth.user.name } : null;
+    const { plan, loading, error, actionError, busyTaskId, toggleDone, reload } = useWeek(house.id, week, me);
 
     // Only the very first load shows the skeleton. Switching weeks keeps the old week, dimmed.
     const showSkeleton = useDelayedFlag(plan === null && !error);

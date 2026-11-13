@@ -16,3 +16,31 @@ a {
     color: var(--accent);
     text-decoration: none;
 }
+
+/* Buttons and tappable rows react to being pressed */
+button,
+.picker-row,
+.tab {
+    transition: transform 0.08s ease;
+}
+
+button:active:not(:disabled),
+.picker-row:active,
+.tab:active {
+    transform: scale(0.97);
+}
+
+/* No movement for people who turned animations off */
+@media (prefers-reduced-motion: reduce) {
+    button,
+    .picker-row,
+    .tab {
+        transition: none;
+    }
+
+    button:active:not(:disabled),
+    .picker-row:active,
+    .tab:active {
+        transform: none;
+    }
+}
