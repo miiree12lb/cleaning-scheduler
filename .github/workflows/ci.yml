@@ -1,0 +1,40 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Get the code
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+                  cache-dependency-path: |
+                      package-lock.json
+                      web/package-lock.json
+
+            - name: Install packages
+              run: |
+                  npm ci
+                  npm ci --prefix web
+
+            - name: Check formatting
+              run: npx prettier --check .
+
+            - name: Type-check the server
+              run: npm run typecheck
+
+            - name: Build the web app
+              run: npm --prefix web run build
+
+            - name: Run the tests
+              run: npm run test -- --run
