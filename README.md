@@ -1,5 +1,7 @@
 # Cleaning Scheduler
 
+[![CI](https://github.com/miiree12lb/cleaning-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/miiree12lb/cleaning-scheduler/actions/workflows/ci.yml)
+
 Weekly chores, shared fairly. A web app for shared houses: tasks rotate between housemates every Monday, everyone ticks off what they did, and the house keeps its rules in one place.
 
 **Live:** [cleaning-scheduler.miiree12lb.workers.dev](https://cleaning-scheduler.miiree12lb.workers.dev)

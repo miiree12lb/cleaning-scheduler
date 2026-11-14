@@ -6,12 +6,24 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 
 - **Cloudflare Workers with static assets + D1**, in one repository and one deployment. Cloudflare recommends Workers over Pages for new projects.
 - **`server/`** holds the Worker (TypeScript, Hono) and the D1 migrations (`server/migrations`). **`web/`** holds the frontend (React + Vite + TypeScript).
-- **TypeScript on both sides**, so types for API data are shared (`shared/` folder, imported with `import type`).
+- **TypeScript on both sides**, so types for API data are shared (`shared/` folder, imported with `import type`). Small functions both sides need live there too, like `safeReturnTo`, so the server and the browser can never disagree.
 - **React Router** for pages. The Worker serves the app in single-page-application mode, and only `/api/*` runs the Worker first (`run_worker_first`). Pages, scripts and styles are served as static files, without the Worker.
 - **Pages:**
     - `/login`, `/privacy`, `/terms`: open to everyone
     - `/` (my houses), `/houses/new`, `/join/:code`, `/account`: logged in
     - `/houses/:houseId`: the calendar (this week first), plus `tasks`, `rules` and `settings`
+
+## Testing and deployment
+
+- **Two kinds of tests**, both with Vitest (`vitest.config.mts`):
+    - **unit** (Node): plain functions, like validators, weeks, the rotation, passwords and links.
+    - **api** (Cloudflare's runtime, through `@cloudflare/vitest-plugin`): the real Worker with a fresh local D1 built from the migrations. They focus on the rules that would hurt most if they broke: who can see a house, admin-only actions, always one admin, only the person who ticked a task can untick it, login and sessions, and quotas.
+- **Tests aim at risk, not at 100% coverage.** Display-only code isn't tested. Every fixed bug gets a test that would have caught it.
+- **Each API test makes its own users and houses** (unique emails), so tests never depend on each other. Each request gets its own IP, so the rate limiters don't get in the way.
+- **CI** (GitHub Actions, `.github/workflows/ci.yml`) runs formatting, lint, typecheck, build and tests on every push and pull request.
+- **Merging into `main` deploys automatically**, only after the checks pass: migrations first, then the code. New work happens on a branch, through a pull request. A GitHub ruleset protects `main` (pull requests only, the `check` job must pass, no force pushes or deletion).
+- **The deploy uses a narrow Account API token** (Workers and D1 only, this account only, expires after a year), stored as a GitHub secret. The app's own secrets stay in Cloudflare.
+- **Lint:** ESLint's recommended rules for TypeScript, React hooks and React refresh. `react-hooks/set-state-in-effect` is off: pages load their data in effects. Moving to a data-fetching library (TanStack Query) would allow turning it back on.
 
 ## Accounts and login
 
@@ -164,7 +176,8 @@ Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 - **Email invites**, shown to the person when they next log in.
 - House switcher in the navbar; renaming a house; showing who's resting this week; reminders (Cron).
 - Tasks page: descriptions, upcoming rotation and history.
-- Remembering pages already seen, so switching tabs is instant (probably with TanStack Query), if it feels slow on phones.
+- Remembering pages already seen, so switching tabs is instant (probably with TanStack Query), if it feels slow on phones. It would also allow turning the `set-state-in-effect` lint rule back on.
 - A demo account for the portfolio, reset every night.
 - If abuse appears: Turnstile on sign-up, and a per-email login limiter.
+- End-to-end tests with Playwright (a real browser: log in, create a house, tick a task).
 - Optional: task weights, letting admins reorder the rotation.

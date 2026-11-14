@@ -3,6 +3,9 @@ name: CI
 on:
     push:
         branches: [main]
+        # A push that only changes Markdown (README, docs) doesn't need checks or a deploy
+        paths-ignore:
+            - "**.md"
     pull_request:
 
 jobs:
