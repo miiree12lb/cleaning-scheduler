@@ -1,3 +1,4 @@
+/// <reference path="../../worker-configuration.d.ts" />
 import { exports } from "cloudflare:workers";
 
 type Options = { method?: string; body?: unknown; session?: string };
@@ -25,7 +26,7 @@ export async function api(
 }
 
 // The session token from a response's Set-Cookie header
-function sessionFrom(res: Response): string {
+export function sessionFrom(res: Response): string {
     const match = res.headers.get("Set-Cookie")?.match(/session=([^;]+)/);
     if (!match) throw new Error("No session cookie in the response");
     return match[1];
@@ -81,4 +82,22 @@ export async function joinHouse(
     });
     if (!res.ok)
         throw new Error(`Joining failed: ${res.status} ${await res.text()}`);
+}
+
+// A new task in a house (as admin). Returns its id.
+export async function createTask(
+    adminSession: string,
+    houseId: number,
+    name: string,
+) {
+    const res = await api(`/api/houses/${houseId}/tasks`, {
+        method: "POST",
+        body: { name },
+        session: adminSession,
+    });
+    if (res.status !== 201)
+        throw new Error(
+            `Creating the task failed: ${res.status} ${await res.text()}`,
+        );
+    return ((await res.json()) as { id: number }).id;
 }
