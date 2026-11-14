@@ -11,6 +11,8 @@ import { onSessionExpired } from "../utils/apiFetch";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// The provider and its hook live together on purpose. This file just reloads fully when edited.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
     const auth = useContext(AuthContext);
     if (!auth) throw new Error("useAuth must be used inside <AuthProvider>");

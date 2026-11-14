@@ -29,6 +29,9 @@ jobs:
 
             - name: Check formatting
               run: npx prettier --check .
+              
+            - name: Lint the web app
+              run: npm --prefix web run lint
 
             - name: Type-check the server
               run: npm run typecheck

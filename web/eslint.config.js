@@ -15,6 +15,11 @@ export default defineConfig([
             reactHooks.configs.flat.recommended,
             reactRefresh.configs.vite,
         ],
+        rules: {
+            // Pages load their data in effects (fetch, then set state). This newer rule asks for a
+            // data-fetching library instead (planned: TanStack Query). The current pattern works.
+            "react-hooks/set-state-in-effect": "off",
+        },
         languageOptions: {
             globals: globals.browser,
         },
