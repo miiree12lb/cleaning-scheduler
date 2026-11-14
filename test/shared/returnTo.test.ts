@@ -5,7 +5,9 @@ describe("safeReturnTo", () => {
     it("accepts paths inside the app", () => {
         expect(safeReturnTo("/")).toBe("/");
         expect(safeReturnTo("/join/2646e9d0c3")).toBe("/join/2646e9d0c3");
-        expect(safeReturnTo("/houses/2/calendar?week=2026-11-16")).toBe("/houses/2/calendar?week=2026-11-16");
+        expect(safeReturnTo("/houses/2/calendar?week=2026-11-16")).toBe(
+            "/houses/2/calendar?week=2026-11-16",
+        );
     });
 
     it("rejects nothing at all", () => {

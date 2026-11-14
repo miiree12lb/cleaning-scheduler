@@ -46,7 +46,10 @@ describe("parseIdList", () => {
 
 describe("parseName", () => {
     it("trims the name", () => {
-        expect(parseName("  Kitchen  ")).toEqual({ ok: true, value: "Kitchen" });
+        expect(parseName("  Kitchen  ")).toEqual({
+            ok: true,
+            value: "Kitchen",
+        });
     });
 
     it("rejects empty, too long, and non-text names", () => {
@@ -69,7 +72,10 @@ describe("parseDescription", () => {
     });
 
     it("trims, and limits the length to 200", () => {
-        expect(parseDescription("  Wipe the stove too ")).toEqual({ ok: true, value: "Wipe the stove too" });
+        expect(parseDescription("  Wipe the stove too ")).toEqual({
+            ok: true,
+            value: "Wipe the stove too",
+        });
         expect(parseDescription("a".repeat(201)).ok).toBe(false);
     });
 });
@@ -113,7 +119,10 @@ describe("parseWeekStart", () => {
 
 describe("parseSectionName", () => {
     it("trims, and limits the length to 40", () => {
-        expect(parseSectionName(" Dishwasher ")).toEqual({ ok: true, value: "Dishwasher" });
+        expect(parseSectionName(" Dishwasher ")).toEqual({
+            ok: true,
+            value: "Dishwasher",
+        });
         expect(parseSectionName("a".repeat(41)).ok).toBe(false);
         expect(parseSectionName("").ok).toBe(false);
     });
@@ -121,7 +130,10 @@ describe("parseSectionName", () => {
 
 describe("parseRuleText", () => {
     it("trims, and limits the length to 300", () => {
-        expect(parseRuleText("  No shoes inside ")).toEqual({ ok: true, value: "No shoes inside" });
+        expect(parseRuleText("  No shoes inside ")).toEqual({
+            ok: true,
+            value: "No shoes inside",
+        });
         expect(parseRuleText("a".repeat(301)).ok).toBe(false);
         expect(parseRuleText("   ").ok).toBe(false);
     });
@@ -129,8 +141,14 @@ describe("parseRuleText", () => {
 
 describe("parsePassword", () => {
     it("accepts 10 to 200 characters, without trimming", () => {
-        expect(parsePassword("1234567890")).toEqual({ ok: true, value: "1234567890" });
-        expect(parsePassword("  spaces count  ")).toEqual({ ok: true, value: "  spaces count  " });
+        expect(parsePassword("1234567890")).toEqual({
+            ok: true,
+            value: "1234567890",
+        });
+        expect(parsePassword("  spaces count  ")).toEqual({
+            ok: true,
+            value: "  spaces count  ",
+        });
         expect(parsePassword("a".repeat(200)).ok).toBe(true);
     });
 
@@ -143,7 +161,10 @@ describe("parsePassword", () => {
 
 describe("parseEmail", () => {
     it("trims and lowercases the email", () => {
-        expect(parseEmail("  Roommate@Example.COM ")).toEqual({ ok: true, value: "roommate@example.com" });
+        expect(parseEmail("  Roommate@Example.COM ")).toEqual({
+            ok: true,
+            value: "roommate@example.com",
+        });
     });
 
     it("rejects things that aren't an email", () => {

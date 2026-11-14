@@ -16,14 +16,14 @@ Weekly chores, shared fairly. A web app for shared houses: tasks rotate between 
 
 ## Tech stack
 
-| Part | Choice |
-|---|---|
-| Hosting | Cloudflare Workers with static assets, one deployment for app and API |
-| Database | Cloudflare D1 (SQLite), with versioned migrations |
-| API | [Hono](https://hono.dev) on the Worker, in TypeScript |
-| Frontend | React, React Router and Vite, in TypeScript |
-| Shared types | One `shared/` folder used by both the API and the frontend |
-| Tests | Vitest |
+| Part         | Choice                                                                |
+| ------------ | --------------------------------------------------------------------- |
+| Hosting      | Cloudflare Workers with static assets, one deployment for app and API |
+| Database     | Cloudflare D1 (SQLite), with versioned migrations                     |
+| API          | [Hono](https://hono.dev) on the Worker, in TypeScript                 |
+| Frontend     | React, React Router and Vite, in TypeScript                           |
+| Shared types | One `shared/` folder used by both the API and the frontend            |
+| Tests        | Vitest                                                                |
 
 ## How it works
 

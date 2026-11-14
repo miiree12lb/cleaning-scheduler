@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/miiree12lb/cleaning-scheduler#readme",
   "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.8.2",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.1.0",
     "prettier": "^3.9.10",
