@@ -25,10 +25,13 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 - **Passwords:** at least 10 characters, at most 200, not trimmed. No rules about symbols (length matters more).
 - **No email verification**, since the app can't send email yet. Nobody can join a house without an invite link anyway.
 - **Login errors are the same for every failure** ("Wrong email or password"), and the hash always runs, even for an unknown email, so neither the message nor the response time reveals which emails have an account.
+- **Sign-up asks to confirm 16+ and the Terms** (a checkbox, checked on the server). Google sign-ups confirm through the line under the login form. Sign-up errors say which field they're about, so the form marks that field.
 - **Sessions:** a random token in an `httpOnly`, `SameSite=Lax`, `Secure` cookie. The database only stores the token's **SHA-256 hash**, so a leaked `sessions` table can't be used to log in. Sessions last 30 days, logging out deletes the session, and expired sessions are deleted at each login.
-- **Log out options:** Logging out ends this device’s session. ‘Log out on all devices’ deletes every session of the user.
-- **Google login** uses a `state` cookie to check that the login started in the same browser, and a `returnTo` path (only paths starting with `/` and not `//`) to go back to an invite link after logging in.
-- **Dev login** (`/api/auth/dev-login/:userId`) only exists when `DEV_LOGIN=true` in `.dev.vars`, for local testing. It must never be set in production. After each deploy, check that it answers "Not found".
+- **Log out options:** logging out ends this device's session. "Log out on all devices" deletes every session of the user.
+- **When a session ends** (any API call gets a 401), the app sends you to the login page with "Your session ended", and back to the same page after logging in. All API calls go through `apiFetch` for this.
+- **Google login** uses a `state` cookie to check that the login started in the same browser, and a `returnTo` path to go back to an invite link after logging in. Only paths inside the app are accepted: starting with `/`, not `//`, and without backslashes or spaces.
+- **There's no way to log in without Google or a password**, not even for local testing. Test accounts are made with email and password.
+- **After logging in, you land in the last house you opened** on that device (or your only house). Clicking the house name always shows the list of houses, where you can also create a house or join with an invite.
 - **Deleting an account** is refused if the person is the only admin of any house (they must hand over admin or delete the house first). Otherwise they leave all their houses, their unfinished tasks this week go to their housemates, and their past activity stays as "Former member".
 - **No password reset yet.** For now an admin of a shared house helps, or the account is recreated. A reset link by email needs our own domain (see Later).
 
@@ -39,7 +42,7 @@ Choices made while designing the cleaning scheduler, and why. Update this when a
 - **A house must always have at least one admin.** Removing, demoting or letting the last admin leave is refused. The check is inside the `UPDATE` itself, so two admins demoting each other at the same moment can't leave a house without one.
 - Only admins can remove people. Anyone can leave, except the last admin.
 - **The last member can't leave a house.** They have to delete the house instead, so a house's history is never deleted as a side effect.
-- **People join by invite link.** Only admins see the code, and they can replace it (the old link stops working). Someone who isn't logged in logs in or signs up first, and comes back to the invite.
+- **People join by invite link**, or by pasting the link or code on the list of houses. Only admins see the code, and they can replace it (the old link stops working). Someone who isn't logged in logs in or signs up first, and comes back to the invite.
 - **Deleting a house** is for admins only, and needs the house's name typed exactly, plus a confirmation. Everything in the house is deleted with it.
 - Every new house gets a **General** rule section.
 - **Every API request for a house checks that the user is a member of that house** (`requireMember`), and every query is filtered by that house's ID. This is the most important security check.
@@ -91,6 +94,15 @@ Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 - **Only admins edit sections and rules.** Every member can answer "I use this".
 - There's **no separate Dishwasher page** anymore. A Dishwasher section isn't created by default; admins add it if the house needs it.
 
+## Loading and errors
+
+- **Loading:** pages show gray skeletons in the shape of their content, but only after 300 ms, so fast loads never flash. `index.html` shows "Loading…" until the JavaScript arrives.
+- **Load errors** show what failed with a **Try again** button, and say whether you seem to be offline. A failed refresh in the background keeps what's already on screen.
+- **A crash** in a page shows "Something went wrong" with a Reload button instead of a white page (an error boundary, reset when you change page).
+- **Not found:** unknown pages and houses you can't open show a 404 page with a way back to your houses.
+- **Ticking a task is instant:** the checkbox changes right away, and goes back with an error if the server refuses.
+- **Buttons react when pressed** (a small shrink), except for people who turned animations off.
+
 ## Security
 
 - **SQL:** every query uses `prepare(...).bind(...)`. Values are never put into the SQL text.
@@ -119,15 +131,18 @@ Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 - **No CORS**, so other sites can't read the API. Together with `SameSite=Lax` cookies, that also stops other sites from making requests with someone's session. **`GET` routes never change anything.**
 - **Secrets** (`GOOGLE_CLIENT_SECRET`) are in `.dev.vars` locally (never committed) and set with `wrangler secret put` in production. They're never logged.
 - `/api/health` only says whether the app and database answer. It doesn't reveal anything like the number of users.
+- **React escapes all text**, so nothing a user types can run as code. The app never uses `dangerouslySetInnerHTML`, and no link is built from user input.
 
 ## Privacy and legal
 
 - The app is run from the Netherlands and is open to anyone, so the **GDPR** applies. The Dutch authority is the Autoriteit Persoonsgegevens.
-- **Privacy policy** at `/privacy`, **terms of use** at `/terms`, both linked under the login form and set in the Google OAuth consent screen.
+- **Privacy policy** at `/privacy`, **terms of use** at `/terms`, both linked under the login form and on the Account page, and set in the Google OAuth consent screen.
 - **Collect only what's needed.** No analytics, no tracking, no ads.
-- **Only strictly necessary cookies** (session, Google login state), so no cookie banner.
+- **No requests to third parties from the browser** besides Google login: no fonts, scripts or images from other sites (a German court fined a site for loading Google Fonts).
+- **Only strictly necessary cookies** (session, Google login state), so no cookie banner. The theme and the last house opened are kept in the browser's `localStorage`.
 - **Whenever the app stores something new, update the privacy policy** (and its date).
 - No Impressum needed in the Netherlands for a free, non-commercial app.
+- **All packages that ship to users have permissive licenses** (MIT, ISC, Apache). Check with `npx license-checker --summary` after adding one.
 
 ## Database conventions
 
@@ -147,9 +162,9 @@ Ties for "fewest tasks" go to the member with the lowest `rotation_order`.
 - **Password reset:** an admin can set a temporary password; by email once we have a domain.
 - **Own domain:** nicer URL, email sending (password reset, email invites), Cloudflare's WAF rules. Remember to add the new callback URL in Google Cloud.
 - **Email invites**, shown to the person when they next log in.
-- House switcher in the navbar; renaming a house; showing who's resting this week.
+- House switcher in the navbar; renaming a house; showing who's resting this week; reminders (Cron).
 - Tasks page: descriptions, upcoming rotation and history.
-- A React error boundary, loading states, reminders (Cron).
+- Remembering pages already seen, so switching tabs is instant (probably with TanStack Query), if it feels slow on phones.
 - A demo account for the portfolio, reset every night.
 - If abuse appears: Turnstile on sign-up, and a per-email login limiter.
 - Optional: task weights, letting admins reorder the rotation.

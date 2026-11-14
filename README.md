@@ -79,7 +79,6 @@ Create a file **`.dev.vars`** in the project root (it's git-ignored):
 ```
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-client-secret
-DEV_LOGIN=true
 ```
 
 The Google values come from an OAuth client in Google Cloud, with `http://localhost:5173/api/auth/callback` as a redirect URI. Without them, you can still create an account with email and password. `DEV_LOGIN=true` turns on `/api/auth/dev-login/:userId` for quick testing; never set it in production.
