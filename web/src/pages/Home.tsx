@@ -7,17 +7,8 @@ import { apiFetch } from "../utils/apiFetch";
 import ErrorState from "../utils/ErrorState";
 import { useDelayedFlag } from "../utils/useDelayedFlag";
 import { SkeletonBlock, SkeletonPage } from "../utils/Skeleton";
-
+import { extractCode } from "../utils/inviteLink";
 import "../css/home.css";
-
-// Accepts a whole invite link (".../join/2646e9d0c3") or just the code
-function extractCode(input: string): string | null {
-    const match = input
-        .trim()
-        .toLowerCase()
-        .match(/([0-9a-f]{10})\/?$/);
-    return match ? match[1] : null;
-}
 
 export default function Home() {
     const [houses, setHouses] = useState<HouseSummary[] | null>(null);

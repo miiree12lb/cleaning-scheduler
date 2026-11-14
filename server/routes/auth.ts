@@ -7,6 +7,7 @@ import { randomHex } from "../lib/random";
 import { exchangeCode } from "../lib/google";
 import { removeMember } from "../lib/members";
 import { rateLimit } from "../lib/rateLimit";
+import { safeReturnTo } from "../../shared/returnTo";
 import {
     hashPassword,
     verifyPassword,
@@ -18,14 +19,6 @@ import type { SessionUser } from "../../shared/types";
 const auth = new Hono<AppEnv>();
 
 // ---------- Helpers ----------
-
-// Only paths inside this app: "/join/abc". Not "//evil.com" or "/\evil.com",
-// which browsers treat as another website.
-function safeReturnTo(value: string | undefined): string | null {
-    if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
-    if (/[\\\s]/.test(value)) return null; // no backslashes, spaces or line breaks
-    return value;
-}
 
 // Read the JSON body; null if it isn't valid JSON
 async function readBody(

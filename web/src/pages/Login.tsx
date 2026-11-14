@@ -1,6 +1,7 @@
 import { Link, Navigate, useSearchParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import PasswordForm from "./login/PasswordForm";
+import { safeReturnTo } from "../../../shared/returnTo";
 import "../css/login.css";
 
 const ERRORS: Record<string, string> = {
@@ -10,14 +11,6 @@ const ERRORS: Record<string, string> = {
         "This email already has an account with a password. Log in with your email and password below.",
     too_many: "Too many login attempts. Wait a minute and try again.",
 };
-
-// Only paths inside this app: "/join/abc". Not "//evil.com" or "/\evil.com",
-// which browsers treat as another website. The server checks it the same way.
-function safeReturnTo(value: string | null): string | null {
-    if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
-    if (/[\\\s]/.test(value)) return null; // no backslashes, spaces or line breaks
-    return value;
-}
 
 export default function Login() {
     const { auth } = useAuth();
